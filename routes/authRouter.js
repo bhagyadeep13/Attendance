@@ -5,6 +5,7 @@ const authRouter = express.Router();
 // Local Module
 const authController = require("../controllers/authController");
 
+authRouter.get("/", authController.getHomePage);
 authRouter.get("/login", authController.getLogIn);
 authRouter.post("/login", authController.postLogIn);
 authRouter.post("/logout", authController.postLogOut);

@@ -3,6 +3,15 @@ const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
 
+exports.getHomePage = async(req,res,next)=>
+{
+    res.render('store/HomePage',{
+      pageTitle: 'HomePage',
+      currentPage: 'HomePage',
+      IsLoggedIn: req.body.IsLoggedIn
+    });
+}
+
 exports.getLogIn = (req, res, next) => {
   res.render("auth/login", {
     pageTitle: "Login Page",
@@ -19,9 +28,8 @@ exports.getLogIn = (req, res, next) => {
 };
 
 exports.postLogIn = async (req, res, next) => {
-  console.log(req.body)
+
   const { email, password } = req.body;
-  console.log(email, password)
   const user = await User.findOne({ email: email })
   {
     if (!user) {
@@ -34,7 +42,8 @@ exports.postLogIn = async (req, res, next) => {
           email: email,
           password: password
         },
-        user: {}
+        user: {},
+        loginMessage: req.session.loginMessage || ''
       });
     }
     else{
@@ -49,7 +58,8 @@ exports.postLogIn = async (req, res, next) => {
           email: email,
           password: password,
         },
-        user: {}
+        user: {},
+        loginMessage: ""
       });
     }
     else
@@ -64,7 +74,7 @@ exports.postLogIn = async (req, res, next) => {
         currentPage: "LoggedInUser",
         IsLoggedIn: true,
         user: user,
-        loginMessage: req.session.loginMessage
+        loginMessage: true 
       })
     }
   }
@@ -83,6 +93,9 @@ exports.postLogOut = (req, res, next) => {
 
 
 exports.getSignUp = (req, res, next) => {
+
+  const {userType} = req.query;
+
   res.render("auth/signup", {
     pageTitle: "Sign Page",
     currentPage: "signup",
@@ -95,8 +108,9 @@ exports.getSignUp = (req, res, next) => {
       password: '',
       confirmPassword: '',
       userType: '',
-      loginMessage: ''
-    }
+      loginMessage: req.session.loginMessage || ''
+    },
+    userType: userType,
 })
 };
 
@@ -157,7 +171,7 @@ exports.postSignUp = [
           email: email,
           password: password,
           userType: userType,
-          loginMessage: ''
+          loginMessage: req.session.loginMessage || ''
         },
         user: {}
       });
@@ -190,7 +204,7 @@ exports.postSignUp = [
             email: email,
             password: password,
             userType: userType,
-            loginMessage: ''
+            loginMessage: req.session.loginMessage || ''
           },
           user: {}
         });

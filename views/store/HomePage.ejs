@@ -1,0 +1,50 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl w-full max-w-6xl mx-4 p-10 flex flex-col gap-8">
+    <h1 class="text-4xl font-extrabold text-purple-700 text-center mb-2">Attendance Portal</h1>
+    <p class="text-center text-gray-600 mb-6">Welcome! Please register or login as Teacher, Student, or Admin.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Teacher Card -->
+      <div class="bg-white/70 rounded-xl shadow p-6 flex flex-col items-center">
+        <div class="text-purple-600 text-3xl mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-7m0 0l-9-5m9 5l9-5" /></svg>
+        </div>
+        <h2 class="font-bold text-lg mb-2">Teacher</h2>
+        <div class="flex gap-2">
+          <form action="/signup", method="GET">
+          <button name="userType" value="teacher" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition">Register</button>
+           </form>
+          <a href="/login" class="bg-purple-100 text-purple-700 px-4 py-2 rounded-lg font-semibold hover:bg-purple-200 transition">Login</a>
+        </div>
+      </div>
+      <!-- Student Card -->
+      <div class="bg-white/70 rounded-xl shadow p-6 flex flex-col items-center">
+        <div class="text-pink-500 text-3xl mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        </div>
+        <h2 class="font-bold text-lg mb-2">Student</h2>
+        <div class="flex gap-2">
+          <form action="/signup", method="GET">
+          <button name="userType" value="student" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition">Register</button>
+           </form
+          <a href="/student/login" class="bg-pink-100 text-pink-700 px-4 py-2 rounded-lg font-semibold hover:bg-pink-200 transition">Login</a>
+        </div>
+      </div>
+      <!-- Admin Card -->
+      <div class="bg-white/70 rounded-xl shadow p-6 flex flex-col items-center">
+        <div class="text-blue-500 text-3xl mb-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21m6-4l.75 4M4 4h16v2a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm0 0V2a2 2 0 012-2h12a2 2 0 012 2v2" /></svg>
+        </div>
+        <h2 class="font-bold text-lg mb-2">Admin</h2>
+        <div class="flex gap-2">
+          <form action="/signup", method="GET">
+          <button name="userType" value="teacher"class="bg-blue-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-600 transition">Register</button>
+           </form>
+          <a href="/admin/login" class="bg-blue-100 text-blue-700 px-4 py-2 rounded-lg font-semibold hover:bg-blue-200 transition">Login</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

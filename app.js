@@ -1,6 +1,6 @@
 // Core Module
 const path = require('path');
-
+const Student = require('./models/student');
 // External Module
 const express = require('express');
 const session = require('express-session')
@@ -13,6 +13,8 @@ const rootDir = require("./utils/pathUtil");
 const errorsController = require("./controllers/errors");
 const { default: mongoose } = require('mongoose');
 const authRouter = require('./routes/authRouter');
+const AddRouter = require('./routes/Add_student');
+const markAttendanceRouter = require('./routes/markAttendence');
 
 const app = express();
 
@@ -29,7 +31,7 @@ app.use(express.urlencoded());
 app.use(session({
   secret : "bhagyadeep",
   resave: false,
-  saveUninitialized : true,
+  saveUninitialized : false,
   store: store
 }))
 
@@ -49,8 +51,14 @@ app.use(session({
   next();
 })*/
 
-app.use(authRouter)
 
+app.use(express.json()); // important to parse JSON body
+
+app.use(authRouter)
+app.use(AddRouter);
+app.use(markAttendanceRouter)
+
+// isLoggedIn == true ho tabhi next karo nhi toh "/" redirect ho
 app.use('/host',(req,res,next)=>{
   if(req.session.IsLoggedIn)
   {
@@ -67,7 +75,7 @@ app.use(express.static(path.join(rootDir, 'public')))
 
 app.use(errorsController.pageNotFound);
 
-const PORT = 3002;
+const PORT = 3004;
 
 mongoose.connect(DB_PATH).then(() => {
   console.log('Connected to Mongo');

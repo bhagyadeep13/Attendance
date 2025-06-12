@@ -1,6 +1,27 @@
 <header class="bg-gradient-to-r from-purple-600 via-pink-500 to-yellow-400 text-white p-6 text-white p-4 shadow-md">
   <nav class="container mx-auto flex justify-between items-center">
     <ul class="flex space-x-4">
+      <li>
+        <a
+          href="/upload"
+          class="<%= currentPage === 'Home' ? 'bg-red-400' : 'hover:bg-red-400' %> py-2 px-4 rounded transition duration-300"
+          >Upload Student Data</a
+        >
+      </li>
+      <li>
+        <a
+          href="/markAttendance"
+          class="<%= currentPage === 'Home' ? 'bg-red-400' : 'hover:bg-red-400' %> py-2 px-4 rounded transition duration-300"
+          >Mark Attendance</a
+        >
+      </li>
+      <li>
+        <a
+          href="/showStudents"
+          class="<%= currentPage === 'Home' ? 'bg-red-400' : 'hover:bg-red-400' %> py-2 px-4 rounded transition duration-300"
+          >View,delete,add manually Students</a
+        >
+      </li>
       <% if (IsLoggedIn) { %>
         <% if (user && user.userType === 'student') { %>
       <li>
