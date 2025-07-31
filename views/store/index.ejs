@@ -7,7 +7,7 @@
       </h2>
       <div class="flex flex-wrap justify-center gap-6">
         <% registeredHomes.forEach(home => { %>
-          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 w-full max-w-sm">
+          <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 w-full max-w-sm animate-high">
             <img src="<%= home.photoUrl %>" alt="<%= home.houseName %>" class="w-full h-48 object-cover">
             <div class="p-4">
               <h3 class="text-xl font-semibold text-gray-800 mb-2"><%= home.houseName %></h3>
@@ -52,6 +52,23 @@
     }
     .animate-fade-in-down {
       animation: fade-in-down 0.3s ease-out;
+    }
+    @keyframes high {
+      0% {
+        opacity: 0;
+        transform: translateY(40px) scale(0.95);
+      }
+      60% {
+        opacity: 1;
+        transform: translateY(-10px) scale(1.05);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+    .animate-high {
+      animation: high 0.7s cubic-bezier(0.23, 1, 0.32, 1);
     }
   </style>
 <% } %>

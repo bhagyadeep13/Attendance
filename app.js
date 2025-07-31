@@ -14,6 +14,7 @@ const errorsController = require("./controllers/errors");
 const { default: mongoose } = require('mongoose');
 const authRouter = require('./routes/authRouter');
 const AddRouter = require('./routes/Add_student');
+const aboutRouter = require('./routes/aboutRoute');
 const markAttendanceRouter = require('./routes/markAttendence');
 
 const app = express();
@@ -57,6 +58,7 @@ app.use(express.json()); // important to parse JSON body
 app.use(authRouter)
 app.use(AddRouter);
 app.use(markAttendanceRouter)
+app.use(aboutRouter);
 
 // isLoggedIn == true ho tabhi next karo nhi toh "/" redirect ho
 app.use('/host',(req,res,next)=>{

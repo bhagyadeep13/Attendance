@@ -1,27 +1,30 @@
 const mongoose = require('mongoose');
 
 const userSchema = mongoose.Schema({
-  firstName: {
+  name: {
     type: String,
-    required: [true,'First name is required'],
-  },
-  lastName: {
-    type: String,
+    required: [true, 'Name is required'],
   },
   email: {
     type: String,
-    required: [true,'Email is required'],
+    required: [true, 'Email is required'],
     unique: true,
   },
   password: {
     type: String,
-    required: [true,'Password is required'],
+    required: [true, 'Password is required'],
     minlength: 8,
   },
   userType: {
     type: String,
-    enum: ['host', 'student'],
-    default: 'host'
+    enum: ['teacher', 'student'],
+    default: 'student'
+  },
+  enrollmentNo: {
+    type: String,
+    required: function () {
+      return this.userType === 'student';
+    },
   },
 });
 

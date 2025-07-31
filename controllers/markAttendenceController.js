@@ -1,12 +1,19 @@
 const student = require("../models/student");
 
-exports.markAttendance = async (req,res,next) =>
+exports.getmarkAttendance = async (req,res,next) =>
 {
-  res.render('store/markAttendence',{
-    students: [],
-    selectedClass: '',
-    selectedSection: ''
-  })
+  res.render('store/markAttendence',
+    {
+      students: [],
+      selectedClass: '',
+      selectedSection: '',
+      pageTitle: "Mark Attendance",
+      currentPage: "Mark Attendance",
+      IsLoggedIn: false,
+      pageTitle: "Mark Attendance",
+      currentPage: "Mark_Attendance",
+      isLoggedIn: req.session.isLoggedIn || false,
+    })
 }
 
 exports.markAttendanceDetails = async (req,res,next)=>
@@ -21,6 +28,10 @@ exports.markAttendanceDetails = async (req,res,next)=>
             selectedDate: Date,
             selectedSection: sectionName,
             students: classDoc.students,
+            pageTitle: "Mark Attendance",
+            currentPage: "Mark_Attendance",
+            IsLoggedIn: req.session.isLoggedIn || false,
           })
       }
   }
+

@@ -64,7 +64,10 @@ exports.getStudentsByClassAndSection = async (req, res) => {
     return res.render('store/showStudents', {
       selectedClass: '',
       selectedSection: '',
-      students: []
+      students: [],
+      pageTitle: "Show Students",
+      currentPage: "Show_Students",
+      IsLoggedIn: req.session.isLoggedIn || false,
     });
   }
     const classDoc = await Student.findOne({ className, sectionName });
@@ -73,14 +76,20 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       return res.render('store/showStudents', {
         selectedClass: className,
         selectedSection: sectionName,
-        students: []
+        students: [],
+        pageTitle: "Show Students",
+        currentPage: "Show_Students",
+        IsLoggedIn: req.session.isLoggedIn || false,
       });
     }
     else {
     res.render('store/showStudents', {
       selectedClass: className,
       selectedSection: sectionName,
-      students: classDoc ? classDoc.students : []
+      students: classDoc ? classDoc.students : [],
+      pageTitle: "Show Students",
+      currentPage: "Show_Students",
+      IsLoggedIn: req.session.isLoggedIn || false,
     });
   } 
 }
@@ -130,6 +139,9 @@ exports.addNewStudent = async (req,res,next) =>
       selectedClass: className,
       selectedSection: sectionName,
       students: student.students,
+      pageTitle: "Show Students",
+      currentPage: "Show_Students",
+      IsLoggedIn: req.session.isLoggedIn || false,
     });
 }
 
@@ -151,5 +163,8 @@ exports.deleteStudent = async (req, res, next) => {
       selectedClass: className,
       selectedSection: sectionName,
       students: student.students,
+      pageTitle: "Show Students",
+      currentPage: "Show_Students", 
+      IsLoggedIn: req.session.isLoggedIn || false,
     });
 }

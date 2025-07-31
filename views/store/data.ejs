@@ -1,12 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Upload Excel and Send POST</title>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.tailwindcss.com"></script>
+<%- include('../partials/head') %>
 </head>
-<body class="bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 min-h-screen flex items-center justify-center">
+<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
+<%- include('../partials/nav') %>
+  <div class="flex items-center justify-center min-h-screen">
   <div class="bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl w-full max-w-4xl mx-4 p-10 flex flex-col md:flex-row gap-10">
     <!-- Left: Form -->
     <div class="flex-1 flex flex-col justify-center">
@@ -56,6 +52,7 @@
       <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">Parsed Students</h2>
       <div id="result" class="text-left text-sm max-h-[24rem] overflow-auto"></div>
     </div>
+  </div>
   </div>
   <script>
     let studentsData = [];

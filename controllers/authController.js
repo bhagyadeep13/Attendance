@@ -2,6 +2,8 @@ const { check, validationResult } = require("express-validator");
 
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
+const e = require("express");
+const { name } = require("ejs");
 
 exports.getHomePage = async(req,res,next)=>
 {
@@ -13,7 +15,14 @@ exports.getHomePage = async(req,res,next)=>
 }
 
 exports.getLogIn = (req, res, next) => {
-  res.render("auth/login", {
+
+  const { userType } = req.query;
+  if (!userType) {
+    res.send("User type is required");
+    return;
+  }
+  if (userType && userType === 'teacher') {
+  res.render("auth/loginTeacher", {
     pageTitle: "Login Page",
     currentPage: "Login",
     IsLoggedIn: false,
@@ -23,10 +32,38 @@ exports.getLogIn = (req, res, next) => {
       password: ''
     },
     user: {},
-    loginMessage:''
+    toastMessage: req.session.toastMessage || '',
 })
-};
-
+}
+else if (userType && userType === 'student') {
+  res.render("auth/loginStudent", {
+    pageTitle: "Login Page",
+    currentPage: "Login",
+    IsLoggedIn: false,
+    error: [],
+    oldInput: {
+      email: '',
+      password: ''
+    },
+    user: {},
+    toastMessage: req.session.toastMessage || '',
+})
+}
+else if (userType && userType === 'admin') {
+  res.render("auth/loginAdmin", {
+    pageTitle: "Login Page",
+    currentPage: "Login",
+    IsLoggedIn: false,
+    error: [],
+    oldInput: {
+      email: '',
+      password: ''
+    },
+    user: {},
+    toastMessage: req.session.toastMessage || '',
+})
+}
+}
 exports.postLogIn = async (req, res, next) => {
 
   const { email, password } = req.body;
@@ -95,8 +132,14 @@ exports.postLogOut = (req, res, next) => {
 exports.getSignUp = (req, res, next) => {
 
   const {userType} = req.query;
-
-  res.render("auth/signup", {
+  if(!userType)
+  {
+    res.send("User type is required");
+    return;
+  }
+  if(userType && userType === 'teacher') 
+  {
+  res.render("auth/signupTeacher", {
     pageTitle: "Sign Page",
     currentPage: "signup",
     IsLoggedIn: false,
@@ -108,111 +151,172 @@ exports.getSignUp = (req, res, next) => {
       password: '',
       confirmPassword: '',
       userType: '',
-      loginMessage: req.session.loginMessage || ''
     },
+    toastMessage: req.session.toastMessage || '',
     userType: userType,
 })
-};
+}
+else if(userType && userType === 'student')
+{
+  res.render("auth/signupStudent", {
+    pageTitle: "Sign Page",
+    currentPage: "signup",
+    IsLoggedIn: false,
+    error: [],
+    oldInput: {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      userType: '',
+    },
+    toastMessage: req.session.toastMessage || '',
+    userType: userType,
+})
+}
+}
 
 exports.postSignUp = [
-  check('firstName')
+  // Common validations
+ check("name")
   .trim()
-  .isLength({ min: 2 })  // minimum length of 2 characters
-  .withMessage('First name is atleast 2 characters long')
-  .matches(/^[A-Za-z]+$/) // matches only alphabetical characters
-  .withMessage('First name must contain only contains Alphabetical characters'),
-  // + --> minimum 1 character
-  // * --> 0 or more characters
+  .isLength({ min: 2 })
+  .withMessage("Name must be at least 2 characters long")
+  .matches(/^[A-Za-z ]+$/)
+  .withMessage("Name must contain only alphabetical characters and spaces"),
 
-  check('lastName')
-  .matches(/^[A-Za-z]*$/) // matches only alphabetical characters
-  .withMessage('Last name must contain only contains Alphabetical characters'),
+  check("email")
+    .isEmail()
+    .withMessage("Please enter a valid email address")
+    .normalizeEmail(),
 
-  check('email')
-  .isEmail()
-  .withMessage('Please enter a valid email address')
-  .normalizeEmail() ,// normalize the email address,
+  check("password")
+    .isLength({ min: 8 })
+    .withMessage("Password must be at least 8 characters long")
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/)
+    .withMessage("Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character")
+    .trim(),
 
-  check('password')
-  .isLength({ min: 8 }) // minimum length of 6 characters
-  .withMessage('Password must be atleast 8 characters long')
-  .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)
-  .withMessage('Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character')
-  .trim(), // remove leading and trailing spaces
+  check("confirmPassword")
+    .trim()
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error("Passwords do not match");
+      }
+      return true;
+    }),
 
-  check('userType')
-  .notEmpty() // ensure the field is not empty
-  .withMessage('User type is required')
-  .isIn(['host', 'student']) // check if the value is either 'host' or 'guest'
-  .withMessage('User type must be either host or guest')
-  .notEmpty(),// ensure the field is not empty
+  check("userType")
+    .notEmpty()
+    .withMessage("User type is required")
+    .isIn(["teacher", "student"])
+    .withMessage("User type must be either 'teacher' or 'student'"),
 
-   check("confirmPassword")
-  .trim()
+  check("terms")
   .custom((value, {req}) => {
-    if (value !== req.body.password) {
-      throw new Error("Passwords do not match");
+    if (value !== "on") {
+      throw new Error("Please accept the terms and conditions");
     }
     return true;
   }),
 
-  (req, res, next) => {
-    const {firstName, lastName, email, password, userType} = req.body;
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {   // if there are validation errors
-      return res.status(422).render("auth/signup", {
-        pageTitle: "Sign Up Page",
-        currentPage: "signup",
-        IsLoggedIn: false,
-        error: errors.array().map(err => err.msg),
-        oldInput: {
-          firstName: firstName,
-          lastName: lastName,
-          email: email,
-          password: password,
-          userType: userType,
-          loginMessage: req.session.loginMessage || ''
-        },
-        user: {}
-      });
-    }
-    const user = new User({
-      firstName: firstName,
-      lastName: lastName,
-      email: email,
-      password: password,
-      userType: userType
+  check("enrollmentNo")
+    .if((value, { req }) => req.body.userType === "student")    // Conditional field validation for 'student'
+    .notEmpty()
+    .withMessage("Enrollment number is required for students"),
+  async (req, res, next) => {
+
+  const userType = req.body.userType;
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {   // if there are validation errors
+      if(userType && userType==='teacher')
+      {
+      return res.status(422).render("auth/signupTeacher", {
+      pageTitle: "Sign Up Page",
+      currentPage: "signup",
+      IsLoggedIn: false,
+      error: errors.array().map(err => err.msg),
+      oldInput: {
+      name: req.body.name,
+      email: req.body.email,
+      },
+      user: {}
     });
-    user.save()
-      .then(() => {
-        console.log("User registered successfully");
+  }
+}
+if(userType && userType==='student')
+{
+  return res.status(422).render("auth/signupStudent", {
+      pageTitle: "Sign Up Page",
+      currentPage: "signup",
+      IsLoggedIn: false,
+      error: errors.array().map(err => err.msg),
+      oldInput: {
+      name: req.body.name,
+      email: req.body.email,
+      },
+      user: {}
+    });
+}
+  console.log(userType)
+    if(!userType)
+    { 
+      return res.send("User type is required");
+    }
+    if(userType && userType === 'teacher' )
+    {
+        const {name,email,password} = req.body;
+        const user = new User({
+        name: name,
+        email: email,
+        password: password,
+        userType: userType
+    })
+        if(user)
+        {
+        bcrypt.hash(password, 12) // Hash the password with a salt rounds of 12
+          .then(hashedPassword => {
+            user.password = hashedPassword; // Store the hashed password
+            console.log("User registered successfully");
+            return user.save(); // Save the user with the hashed password
+          })
+          res.redirect("/login");
+        }
+        else {
+          res.status(400).send("Error creating user");
+          return;
+        }
+    }
+    if(userType && userType === 'student')
+    {
+        const {enrollmentNo,name,email,password} = req.body;
+        console.log("Received data:", { name, email, password, enrollmentNo, userType });
+        const user = new User({
+        name: name,
+        email: email,
+        password: password,
+        userType: userType,
+        enrollmentNo: enrollmentNo
+    })
+        if(user)
+        {
         bcrypt.hash(password, 12) // Hash the password with a salt rounds of 12
           .then(hashedPassword => {
             user.password = hashedPassword; // Store the hashed password
             return user.save(); // Save the user with the hashed password
           })
-          .catch(err => {
-        console.error("Error while registering user: ", err);
-        res.status(500).render("auth/signup", {
-          pageTitle: "Sign Up Page",
-          currentPage: "signup",
-          IsLoggedIn: false,
-          error: [err],
-          oldInput: {
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            password: password,
-            userType: userType,
-            loginMessage: req.session.loginMessage || ''
-          },
-          user: {}
-        });
-      });
-      res.redirect("/login");
-      })
-  }
+          res.redirect("/login");
+        }
+        else {
+          res.status(400).send("Error creating user");
+          return;
+        }
+    }
+}
 ];
+
+
 
 // session - server ke pass store hota h (internal cokkie banake)
 // cookie - client ke pass store hota h (not use easily accessable)
