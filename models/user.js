@@ -22,10 +22,19 @@ const userSchema = mongoose.Schema({
   },
   enrollmentNo: {
     type: String,
+    unique: true,
+    sparse: true,
     required: function () {
       return this.userType === 'student';
     },
   },
+});
+// Ensure enrollmentNo is removed from non-students before saving
+userSchema.pre('save', function (next) {
+  if (this.userType !== 'student') {
+    this.enrollmentNo = undefined;
+  }
+  next();
 });
 
 module.exports = mongoose.model('User', userSchema);

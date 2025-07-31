@@ -11,10 +11,13 @@
         <%- include('../partials/error') %>
         <form action="/login" method="POST" class="space-y-6">
           <div>
+            <input type="text" name="userType" value="student" hidden />
+          </div>
+          <div>
             <label for="enrollmentNumber" class="block text-lg text-purple-700 font-semibold mb-2">Enrollment Number</label>
           <input
             type="text"
-            name="enrollmentNumber"
+            name="enrollmentNo"
             placeholder="Enter Your Enrollment Number"
             value="<%= oldInput.enrollmentNumber %>"
             class="w-full px-4 py-3 border border-red-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 transition"

@@ -1,14 +1,14 @@
 const Student = require('../models/student');
 
 exports.getAddStudent = (req, res, next) => {
+  console.log(req.session.IsLoggedIn)
   res.render("store/data", {
     pageTitle: "Upload Page",
     currentPage: "Upload",
-    IsLoggedIn: req.session.IsLoggedIn || false,
+    IsLoggedIn: req.session.IsLoggedIn,
     error: [],
     oldInput: {},
     user: req.session.user || {},
-    loginMessage: req.session.loginMessage || ''
   }
 )
 }; 
@@ -60,6 +60,7 @@ exports.postAddStudent = async (req, res) => {
 exports.getStudentsByClassAndSection = async (req, res) => {
   const { className, sectionName } = req.query;
   console.log('Query parameters:', { className, sectionName });
+  console.log(req.session.IsLoggedIn);
   if (!className || !sectionName) {
     return res.render('store/showStudents', {
       selectedClass: '',
@@ -67,7 +68,8 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       students: [],
       pageTitle: "Show Students",
       currentPage: "Show_Students",
-      IsLoggedIn: req.session.isLoggedIn || false,
+      IsLoggedIn: req.session.IsLoggedIn,
+      user: req.session.user || {},
     });
   }
     const classDoc = await Student.findOne({ className, sectionName });
@@ -79,7 +81,8 @@ exports.getStudentsByClassAndSection = async (req, res) => {
         students: [],
         pageTitle: "Show Students",
         currentPage: "Show_Students",
-        IsLoggedIn: req.session.isLoggedIn || false,
+        IsLoggedIn: req.session.IsLoggedIn,
+        user: req.session.user || {},
       });
     }
     else {
@@ -89,7 +92,8 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       students: classDoc ? classDoc.students : [],
       pageTitle: "Show Students",
       currentPage: "Show_Students",
-      IsLoggedIn: req.session.isLoggedIn || false,
+      IsLoggedIn: req.session.IsLoggedIn,
+      user: req.session.user || {},
     });
   } 
 }
@@ -141,7 +145,8 @@ exports.addNewStudent = async (req,res,next) =>
       students: student.students,
       pageTitle: "Show Students",
       currentPage: "Show_Students",
-      IsLoggedIn: req.session.isLoggedIn || false,
+      IsLoggedIn: req.session.IsLoggedIn,
+      user: req.session.user || {},
     });
 }
 
@@ -165,6 +170,7 @@ exports.deleteStudent = async (req, res, next) => {
       students: student.students,
       pageTitle: "Show Students",
       currentPage: "Show_Students", 
-      IsLoggedIn: req.session.isLoggedIn || false,
+      IsLoggedIn: req.session.IsLoggedIn,
+      user: req.session.user || {},
     });
 }

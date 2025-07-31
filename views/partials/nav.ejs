@@ -8,7 +8,7 @@
         style="font-family: cursive"
       >
         <span class="text-pink-300 animate-pulse">Attend</span><span class="bg-gradient-to-r from-yellow-300 to-pink-500 bg-clip-text text-transparent ml-1">Ease</span>
-      </a>
+    </a>
     </div>
     <!-- Navigation Links -->
     <ul class="flex items-center space-x-2 md:space-x-6 font-medium">
@@ -18,39 +18,33 @@
           class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'AboutUs' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
         >Home</a>
       </li>
-      <li>
-        <a
-          href="/showStudents"
-          class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'ViewPost' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
-        >Show Student</a>
-      </li>
       <% if (IsLoggedIn) { %>
         <% if (user && user.userType === 'admin') { %>
-          <li>
-            <a
-              href="/update-status"
-              class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'favourites' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
-            >Update Status</a>
-          </li>
           <li>
             <a
               href="/add-admin"
               class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'favourites' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
             >Add Admin</a>
           </li>
+          <li>
+          <a
+            href="/upload"
+            class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-pink-600"
+          >Upload student data</a>
+        </li>
         <% } %>
         <% if (user && user.userType === 'student') { %>
           <li>
             <a
               href="/host-project-list"
               class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'host-homes' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
-            >Edit/Delete Project</a>
+            >DashBoard</a>
           </li>
           <li>
             <a
               href="/add-project"
               class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'AddNewPost' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
-            >Upload Project</a>
+            >Attendance Record</a>
           </li>
           <li>
             <a 
@@ -65,20 +59,22 @@
             </a>
           </li>
         <% } %>
-      <% } %>
-      <% if (!IsLoggedIn) { %>
+        <% if (user && user.userType === 'teacher') { %>
         <li>
-          <a
-            href="/upload"
-            class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-pink-600"
-          >Upload student data</a>
-        </li>
-        <li>
+        <a
+          href="/showStudents"
+          class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'ViewPost' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+        >Show Student</a>
+      </li>
+      <li>
           <a
             href="/markAttendance"
             class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-pink-600"
           >Mark attendence</a>
         </li>
+      <% } %>
+      <% } %>
+      <% if (!IsLoggedIn) { %>
       <% } else { %>
         <li>
           <form action="/logout" method="POST">

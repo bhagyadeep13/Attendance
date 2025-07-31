@@ -2,8 +2,9 @@
 </head>
 <body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
   <%- include('../partials/nav') %>
+  <%- include('../partials/animation') %>
   <div class="max-w-5xl mx-auto bg-white p-8 rounded shadow mt-10">
-    <h1 class="text-2xl font-bold mb-6">Mark Attendance</h1>
+    <h1 class="text-2xl font-bold mb-6">Mark Attendance <%= IsLoggedIn ? ' (Logged In)' : ' (Logged Out)' %></h1>
 
     <!-- Attendance Filter Form -->
     <form action="/markAttendance" method="POST" class=" flex-col md:flex-row gap-4 mb-6">

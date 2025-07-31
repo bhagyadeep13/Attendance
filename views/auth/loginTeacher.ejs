@@ -11,6 +11,9 @@
         <%- include('../partials/error') %>
         <form action="/login" method="POST" class="space-y-6">
           <div>
+            <input type="text" name="userType" value="teacher" hidden />
+          </div>
+          <div>
             <label for="email" class="block text-lg text-purple-700 font-semibold mb-2">Email</label>
             <input
               id="email"

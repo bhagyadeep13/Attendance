@@ -2,6 +2,9 @@ const student = require("../models/student");
 
 exports.getmarkAttendance = async (req,res,next) =>
 {
+  console.log("Session User:", req.session.IsLoggedIn);
+  const userType = req.session.user.userType;
+  console.log("User Type:", userType);
   res.render('store/markAttendence',
     {
       students: [],
@@ -9,10 +12,10 @@ exports.getmarkAttendance = async (req,res,next) =>
       selectedSection: '',
       pageTitle: "Mark Attendance",
       currentPage: "Mark Attendance",
-      IsLoggedIn: false,
+      IsLoggedIn: req.session.IsLoggedIn,
       pageTitle: "Mark Attendance",
       currentPage: "Mark_Attendance",
-      isLoggedIn: req.session.isLoggedIn || false,
+      user: req.session.user || {},
     })
 }
 
@@ -30,7 +33,8 @@ exports.markAttendanceDetails = async (req,res,next)=>
             students: classDoc.students,
             pageTitle: "Mark Attendance",
             currentPage: "Mark_Attendance",
-            IsLoggedIn: req.session.isLoggedIn || false,
+            IsLoggedIn: req.session.IsLoggedIn || false,
+            user: req.session.user || {},
           })
       }
   }
