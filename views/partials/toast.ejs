@@ -1,0 +1,70 @@
+<% if (toastMessage) { %>
+  <style>
+    @keyframes slideDown {
+      from {
+        transform: translateY(-20px);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    @keyframes shrinkBar {
+      from {
+        width: 100%;
+      }
+      to {
+        width: 0%;
+      }
+    }
+
+    .animate-slide-down {
+      animation: slideDown 0.4s ease-out;
+    }
+
+    .progress-bar-animate {
+      animation: shrinkBar 2s linear forwards;
+    }
+  </style>
+
+  <div id="toast"
+       class="fixed top-5 right-5 z-50 px-6 py-4 rounded-lg shadow-lg animate-slide-down overflow-hidden min-w-[250px] border border-gray-200 
+              <% if (toastMessage.type === 'success') { %> bg-green-50 text-white <% } %>
+              <% if (toastMessage.type === 'error') { %> bg-red-50 text-white <% } %>
+              <% if (toastMessage.type === 'info') { %> bg-blue-50 text-blue-500 <% } %>">
+    <div class="flex items-center justify-between">
+      <span class="text-black"><%= toastMessage.text %></span>
+      <button onclick="hideToast()" class="ml-4 text-black hover:text-black-300">
+        ✕
+      </button>
+    </div>
+    <div id="toast-progress"
+       class="h-1.5 w-full mt-2 progress-bar-animate
+       <% if (toastMessage.type === 'success') { %> bg-green-500 opacity-70 <% } %>
+       <% if (toastMessage.type === 'error') { %> bg-red-500 opacity-70 <% } %>
+       <% if (toastMessage.type === 'info') { %> bg-blue-500 opacity-60 <% } %>"></div>
+    </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const toast = document.getElementById("toast");
+      const progress = document.getElementById("toast-progress");
+
+      // Auto-hide after 2 seconds
+      setTimeout(() => {
+        hideToast();
+      }, 2000);
+    });
+
+    function hideToast() {
+      const toast = document.getElementById("toast");
+      if (toast) {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(100%)';
+        setTimeout(() => toast.remove(), 500);
+      }
+    }
+  </script>
+<% } %>

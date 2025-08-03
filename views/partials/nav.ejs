@@ -1,0 +1,100 @@
+<header class="bg-gradient-to-r from-indigo-900 via-purple-700 to-pink-400 text-white shadow-lg">
+  <nav class="container mx-auto flex justify-between items-center py-4 px-6">
+    <!-- Logo / Brand -->
+    <div class="flex items-center space-x-2">
+
+      <a
+        href="/"
+        class="text-3xl font-extrabold tracking-wide transition duration-300 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-900 bg-clip-text text-transparent drop-shadow-lg font-cursive"
+        style="font-family: cursive"
+      >
+        <span class="text-pink-300 animate-pulse">Attend</span><span class="bg-gradient-to-r from-yellow-300 to-pink-500 bg-clip-text text-transparent ml-1">Ease</span>
+    </a>
+    </div>
+    <!-- Navigation Links -->
+    <ul class="flex items-center space-x-2 md:space-x-6 font-medium">
+      <div class="header-right flex items-center gap-4">
+      <a href="/student-dashboard" class="text-blue-600 font-semibold hover:underline">Dashboard</a>
+      <a href="/attendance" class="text-blue-600 font-semibold hover:underline">Attendence</a>
+  <!-- <a href="/mark-attendance" class="text-blue-600 font-semibold hover:underline">Mark Attendance</a>
+  <a href="/view-reports" class="text-blue-600 font-semibold hover:underline">Reports</a>
+  <a href="/logout" class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Logout</a> -->
+</div>
+      <li>
+        <a
+          href="/about"
+          class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'AboutUs' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+        >Home</a>
+      </li>
+      <% if (IsLoggedIn) { %>
+        <% if (user && user.userType === 'admin') { %>
+          <li>
+            <a
+              href="/add-admin"
+              class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'favourites' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+            >Add Admin</a>
+          </li>
+          <li>
+          <a
+            href="/upload"
+            class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-pink-600"
+          >Upload student data</a>
+        </li>
+        <% } %>
+        <% if (user && user.userType === 'student') { %>
+          <li>
+            <a
+              href="/host-project-list"
+              class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'host-homes' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+            >DashBoard</a>
+          </li>
+          <li>
+            <a
+              href="/add-project"
+              class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'AddNewPost' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+            >Attendance Record</a>
+          </li>
+          <li>
+            <a 
+              href="/notifications"
+              class="py-2 px-4 rounded-lg transition duration-300 flex items-center <%= currentPage === 'notifications' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+              title="Notifications"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span class="sr-only">Notifications</span>
+            </a>
+          </li>
+        <% } %>
+        <% if (user && user.userType === 'teacher') { %>
+        <li>
+        <a
+          href="/showStudents"
+          class="py-2 px-4 rounded-lg transition duration-300 <%= currentPage === 'ViewPost' ? 'bg-white text-pink-600 shadow' : 'hover:bg-white hover:text-pink-600' %>"
+        >Show Student</a>
+      </li>
+      <li>
+          <a
+            href="/markAttendance"
+            class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-pink-600"
+          >Mark attendence</a>
+        </li>
+      <% } %>
+      <% } %>
+      <% if (!IsLoggedIn) { %>
+      <% } else { %>
+        <li>
+          <form action="/logout" method="POST">
+            <button
+              type="submit"
+              class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-pink-600"
+            >
+              Logout
+            </button>
+          </form>
+        </li>
+      <% } %>
+    </ul>
+  </nav>
+</header>
