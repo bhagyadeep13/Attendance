@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AttendEase - Student Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/css/tailwind-overrides.css">
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+  <!-- Top Bar -->
+  <div class="flex justify-between items-center p-4 bg-white shadow sticky top-0 z-50">
+    <div class="flex items-center font-bold text-lg">
+      🌟 <span class="ml-2">AttendEase</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <a href="#" class="text-blue-600 font-semibold">Reports</a>
+      <span class="text-xl">🔔</span>
+      <img src="https://via.placeholder.com/32" alt="Profile" class="rounded-full w-8 h-8">
+      <button class="bg-blue-600 text-white px-3 py-1 rounded">Logout</button>
+    </div>
+  </div>
+
+  <!-- Course Input Section -->
+  <div class="flex flex-wrap gap-2 p-4">
+    <input type="text" placeholder="Enter course name" class="border px-2 py-1 rounded w-40">
+    <input type="text" placeholder="Enter class/sem" class="border px-2 py-1 rounded w-40">
+    <input type="text" placeholder="Enter branch" class="border px-2 py-1 rounded w-40">
+    <input type="text" placeholder="Enter teacher 1 (required)" class="border px-2 py-1 rounded w-52">
+    <input type="text" placeholder="Enter teacher 2 (optional)" class="border px-2 py-1 rounded w-52">
+    <button class="bg-blue-600 text-white px-4 py-1 rounded">Submit</button>
+  </div>
+
+  <!-- Courses List -->
+  <div class="p-4">
+    <h3 class="text-lg font-semibold mb-3">Courses List</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <% courses.forEach(course => { %>
+        <div class="bg-white p-4 rounded shadow space-y-1">
+          <p><strong>Course:</strong> <%= course.manualCourse %></p>
+          <p><strong>Class:</strong> <%= course.className %></p>
+          <p><strong>Branch:</strong> <%= course.branchName %></p>
+          <p><strong>Teacher 1:</strong> <%= course.teacher1 %></p>
+          <% if (course.teacher2) { %>
+            <p><strong>Teacher 2:</strong> <%= course.teacher2 %></p>
+          <% } %>
+          <div class="pt-2 space-x-2">
+            <a href="/mark-attendance/<%= course.manualCourse %>" class="bg-blue-600 text-white px-3 py-1 rounded">Mark</a>
+            <a href="/edit-course/<%= course.manualCourse %>" class="bg-yellow-500 text-white px-3 py-1 rounded">Edit</a>
+            <a href="/delete-course/<%= course.manualCourse %>" class="bg-red-500 text-white px-3 py-1 rounded">Delete</a>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+
+  <!-- Attendance Charts -->
+<div class="flex flex-wrap p-4 gap-4">
+  <div class="bg-white p-4 rounded shadow flex-1 min-w-[700px] max-w-sm">
+    <h3 class="text-center text-blue-800 font-medium mb-2">📊 Overall Attendance</h3>
+    <% if (pieData.length === 0) { %>
+      <p class="text-center text-gray-500">No attendance data yet.</p>
+    <% } else { %>
+      <canvas id="overall-attendance-chart" class="w-96 h-96 mx-auto"></canvas>
+    <% } %>
+  </div>
+
+  <div class="bg-white p-4 rounded shadow flex-1 min-w-[700px] max-w-sm">
+    <h3 class="text-center text-blue-800 font-medium mb-2">📈 Attendance % by Subject</h3>
+    <% if (pieData.length === 0) { %>
+      <p class="text-center text-gray-500">No data to display.</p>
+    <% } else { %>
+      <canvas id="attendance-bar-chart" class="w-96 h-96"></canvas>
+    <% } %>
+  </div>
+</div>
+
+  <script>
+  const pieData = <%- JSON.stringify(pieData || []) %>;
+
+  if (pieData.length > 0) {
+    const labels = pieData.map(d => d.name);
+    const data = pieData.map(d => d.value);
+    const totals = pieData.map(d => d.total);
+
+    const pieColors = ['#1e40af', '#f97316', '#10b981', '#e11d48', '#6366f1'];
+
+    // PIE Chart
+    new Chart(document.getElementById('overall-attendance-chart'), {
+      type: 'pie',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Attendance',
+          data,
+          backgroundColor: pieColors,
+        }]
+      },
+      options: {
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const val = context.parsed;
+                const total = totals[context.dataIndex];
+                const percent = total > 0 ? ((val / total) * 100).toFixed(1) : 0;
+                return `${val}/${total} (${percent}%)`;
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // BAR Chart
+    const percentages = pieData.map(d => d.total > 0 ? (d.value / d.total * 100).toFixed(2) : 0);
+
+    new Chart(document.getElementById('attendance-bar-chart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Attendance %',
+          data: percentages,
+          backgroundColor: '#10b981'
+        }]
+      },
+      options: {
+        scales: {
+          y: {
+            beginAtZero: true,
+            max: 100
+          }
+        }
+      }
+    });
+  }
+</script>
+
+
+  <!-- Include Chart.js or Recharts (via chart images or external rendering) -->
+  <!-- You would populate pieData from backend and use Chart.js to draw charts -->
+
+</body>
+</html>

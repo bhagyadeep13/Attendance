@@ -52,6 +52,12 @@ app.use(session({
   next();
 })*/
 
+const studentRoutes = require('./routes/student');
+app.use('/', studentRoutes);
+
+const attendanceRoutes = require('./routes/attendance');
+app.use('/', attendanceRoutes);
+
 
 app.use(express.json()); // important to parse JSON body
 
