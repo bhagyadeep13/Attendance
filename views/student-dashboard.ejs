@@ -1,28 +1,7 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>AttendEase - Student Dashboard</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/css/tailwind-overrides.css">
+<%- include('partials/head') %>
 </head>
-<body class="bg-gray-100 text-gray-900">
-
-  <!-- Top Bar -->
-  <div class="flex justify-between items-center p-4 bg-white shadow sticky top-0 z-50">
-    <div class="flex items-center font-bold text-lg">
-      🌟 <span class="ml-2">AttendEase</span>
-    </div>
-    <div class="flex items-center gap-4">
-      <a href="#" class="text-blue-600 font-semibold">Reports</a>
-      <span class="text-xl">🔔</span>
-      <img src="https://via.placeholder.com/32" alt="Profile" class="rounded-full w-8 h-8">
-      <button class="bg-blue-600 text-white px-3 py-1 rounded">Logout</button>
-    </div>
-  </div>
-
+<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
+<%- include('partials/nav') %>
   <!-- Course Input Section -->
   <div class="flex flex-wrap gap-2 p-4">
     <input type="text" placeholder="Enter course name" class="border px-2 py-1 rounded w-40">
@@ -76,9 +55,9 @@
     <% } %>
   </div>
 </div>
-
   <script>
-  const pieData = <%- JSON.stringify(pieData || []) %>;
+    const pieData = <%- JSON.stringify(pieData) %>;
+    console.log('Pie data:', pieData);
 
   if (pieData.length > 0) {
     const labels = pieData.map(d => d.name);

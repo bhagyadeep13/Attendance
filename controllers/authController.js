@@ -2,18 +2,17 @@ const { check, validationResult } = require("express-validator");
 
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const e = require("express");
-const { name } = require("ejs");
-const { use } = require("react");
-const user = require("../models/user");
 
 exports.getHomePage = async(req,res,next)=>
 {
+  const IsLoggedIn = req.session.IsLoggedIn || false;
+  console.log("IsLoggedIn:", IsLoggedIn);
     res.render('store/HomePage',{
       pageTitle: 'HomePage',
       currentPage: 'HomePage',
-      IsLoggedIn: req.body.IsLoggedIn,
+      IsLoggedIn: IsLoggedIn,
       user: req.session.user || {},
+      toastMessage: req.session.toastMessage || '',
     });
 }
 

@@ -1,8 +1,5 @@
-const express = require('express');
-const router = express.Router();
 
-router.get('/student-dashboard', (req, res) => {
-  const courses = [
+const courses = [
     {
       manualCourse: "Maths",
       className: "2nd Sem",
@@ -21,7 +18,15 @@ router.get('/student-dashboard', (req, res) => {
     { name: "OS", value: 18, total: 24 }
   ];
 
-  res.render('student-dashboard', { courses, pieData });
+exports.getStudentDashboard = (req, res) => 
+{
+  res.render('student-dashboard', { 
+    courses, 
+    pieData,
+    toastMessage: req.session.toastMessage || '',
+    pageTitle: "Student Dashboard",
+    currentPage: "StudentDashboard",
+    IsLoggedIn: req.session.IsLoggedIn || false,
+    user: req.session.user || {},
 });
-
-module.exports = router;
+};
