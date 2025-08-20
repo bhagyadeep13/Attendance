@@ -9,15 +9,17 @@ exports.getAddStudent = (req, res, next) => {
     error: [],
     oldInput: {},
     user: req.session.user || {},
+    toastMessage: req.session.toastMessage || null,
   }
 )
 }; 
 
 exports.postAddStudent = async (req, res) => {
-  try {
-    const { className, sectionName, students } = req.body;
 
-    console.log('Received data:', { className, sectionName, students });
+  try {
+    const { className, sectionName, students ,year} = req.body;
+
+    console.log('Received data:', { className, sectionName,year, students });
 
     // Validate required fields
     if (!className || !sectionName || !Array.isArray(students) || students.length === 0) {
@@ -55,12 +57,14 @@ exports.postAddStudent = async (req, res) => {
     console.error('Error saving students:', error);   
     res.status(500).json({ message: 'Internal server error' });
   }
-}
+};
 
 exports.getStudentsByClassAndSection = async (req, res) => {
   const { className, sectionName } = req.query;
   console.log('Query parameters:', { className, sectionName });
   console.log(req.session.IsLoggedIn);
+  const toastMessage = req.session.toastMessage;
+  req.session.toastMessage = null; // Clear the toast message after rendering
   if (!className || !sectionName) {
     return res.render('store/showStudents', {
       selectedClass: '',
@@ -70,6 +74,7 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       currentPage: "Show_Students",
       IsLoggedIn: req.session.IsLoggedIn,
       user: req.session.user || {},
+      toastMessage: toastMessage || null,
     });
   }
     const classDoc = await Student.findOne({ className, sectionName });
@@ -83,6 +88,7 @@ exports.getStudentsByClassAndSection = async (req, res) => {
         currentPage: "Show_Students",
         IsLoggedIn: req.session.IsLoggedIn,
         user: req.session.user || {},
+        toastMessage: toastMessage || null,
       });
     }
     else {
@@ -94,6 +100,7 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       currentPage: "Show_Students",
       IsLoggedIn: req.session.IsLoggedIn,
       user: req.session.user || {},
+      toastMessage: toastMessage || null,
     });
   } 
 }
@@ -139,6 +146,7 @@ exports.addNewStudent = async (req,res,next) =>
       className: className,
       sectionName: sectionName,
     });
+    req.session.toastMessage = { type: 'success', text: 'New Student added successfully!' };
     res.render('store/showStudents', {
       selectedClass: className,
       selectedSection: sectionName,
@@ -147,6 +155,7 @@ exports.addNewStudent = async (req,res,next) =>
       currentPage: "Show_Students",
       IsLoggedIn: req.session.IsLoggedIn,
       user: req.session.user || {},
+      toastMessage: req.session.toastMessage || null
     });
 }
 
@@ -162,6 +171,8 @@ exports.deleteStudent = async (req, res, next) => {
     student.students.pull(...studentIds.map(id => ({ _id: id })));
 
     await student.save();
+    req.session.toastMessage = { type: 'success', text: 'Student(s) deleted successfully!' };
+    console.log("Student(s) deleted:", req.session.toastMessage);
      /*student.students.pull({ _id: Student_id }); // Use pull to remove by id*/
     console.log("students deleted")
     res.render('store/showStudents', {
@@ -172,5 +183,6 @@ exports.deleteStudent = async (req, res, next) => {
       currentPage: "Show_Students", 
       IsLoggedIn: req.session.IsLoggedIn,
       user: req.session.user || {},
+      toastMessage: req.session.toastMessage || null,
     });
 }

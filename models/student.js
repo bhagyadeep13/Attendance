@@ -12,6 +12,11 @@ const classSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Section name is required']
   },
+  Year: 
+  {
+    type: String,
+    required: [true, 'Year is required']
+  },
   students:
   [{
     name: { type: String, required: true },

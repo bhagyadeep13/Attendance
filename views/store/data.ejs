@@ -37,6 +37,24 @@
           </label>
         </div>
       </div>
+
+      <div class="mb-6">
+        <p class="font-semibold mb-2 text-gray-700">Select Year:</p>
+        <div class="flex gap-6">
+          <label class="flex items-center gap-2">
+            <input type="radio" name="year" value="1" checked class="accent-pink-500" /> I
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="year" value="2" class="accent-pink-500" /> II
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="year" value="3" class="accent-pink-500" /> III
+          </label>
+          <label class="flex items-center gap-2">
+            <input type="radio" name="year" value="4" class="accent-pink-500" /> IV
+          </label>
+        </div>
+      </div>
       <!-- File input -->
       <div class="mb-6">
         <label for="file" class="block font-semibold mb-2 text-gray-700">Upload Excel File:</label>
@@ -97,10 +115,12 @@
 
       const className = document.querySelector('input[name="className"]:checked').value;
       const sectionName = document.querySelector('input[name="sectionName"]:checked').value;
+      const year = document.querySelector('input[name="year"]:checked').value;
 
       const payload = {
         className,
         sectionName,
+        year,
         students: studentsData
       };
 
