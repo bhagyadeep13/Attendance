@@ -62,15 +62,16 @@ exports.postAddStudent = async (req, res) => {
 };
 
 exports.getStudentsByClassAndSection = async (req, res) => {
-  const { className, sectionName } = req.query;
-  console.log('Query parameters:', { className, sectionName });
+  const { className, sectionName, year } = req.query;
+  console.log('Query parameters:', { className, sectionName, year });
   console.log(req.session.IsLoggedIn);
   const toastMessage = req.session.toastMessage;
   req.session.toastMessage = null; // Clear the toast message after rendering
-  if (!className || !sectionName) {
+  if (!className || !sectionName || !year) {
     return res.render('store/showStudents', {
       selectedClass: '',
       selectedSection: '',
+      selectedYear: '',
       students: [],
       pageTitle: "Show Students",
       currentPage: "Show_Students",
@@ -79,12 +80,14 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       toastMessage: toastMessage || null,
     });
   }
-    const classDoc = await Student.findOne({ className, sectionName });
+  console.log('Query parameters:', { className, sectionName, year });
+    const classDoc = await Student.findOne({ className, sectionName, year });
 
     if (!classDoc || classDoc.students.length === 0) {
       return res.render('store/showStudents', {
         selectedClass: className,
         selectedSection: sectionName,
+        selectedYear: year || '',
         students: [],
         pageTitle: "Show Students",
         currentPage: "Show_Students",
@@ -97,6 +100,7 @@ exports.getStudentsByClassAndSection = async (req, res) => {
     res.render('store/showStudents', {
       selectedClass: className,
       selectedSection: sectionName,
+      selectedYear: year || '',
       students: classDoc ? classDoc.students : [],
       pageTitle: "Show Students",
       currentPage: "Show_Students",
@@ -111,7 +115,8 @@ exports.addNewStudent = async (req,res,next) =>
 {
     const className = req.body.className;
     const sectionName = req.body.sectionName;
-    
+    const selectedYear = req.body.year;
+
     const {studentName,enrollmentNo} = req.body;
 
     if (!className || !sectionName || !studentName || !enrollmentNo) {
@@ -147,6 +152,7 @@ exports.addNewStudent = async (req,res,next) =>
     const student = await Student.findOne({
       className: className,
       sectionName: sectionName,
+      year: year
     });
     req.session.toastMessage = { type: 'success', text: 'New Student added successfully!' };
     res.render('store/showStudents', {
