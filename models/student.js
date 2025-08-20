@@ -12,10 +12,10 @@ const classSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Section name is required']
   },
-  Year: 
+  year: 
   {
     type: String,
-    required: [true, 'Year is required']
+    required: [true, 'year is required']
   },
   students:
   [{

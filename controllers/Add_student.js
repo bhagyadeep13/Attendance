@@ -26,7 +26,7 @@ exports.postAddStudent = async (req, res) => {
       return res.status(400).json({ message: 'Invalid or incomplete data format' });
     }
 
-    let classDoc = await Student.findOne({ className, sectionName });
+    let classDoc = await Student.findOne({ className, sectionName , year });
 
     if (classDoc) {
       const existingEnrollments = new Set(classDoc.students.map(s => String(s.enrollmentNo)));
@@ -39,17 +39,19 @@ exports.postAddStudent = async (req, res) => {
       if (uniqueStudents.length === 0) {
         return res.status(409).json({ message: 'All students already exist or are invalid.' });
       }
+      console.log('New class document created 1:', classDoc);
       classDoc.students.push(...uniqueStudents);
       await classDoc.save();
-    } 
-    else {
+    } else {
       const validStudents = students.filter(s => s.name && String(s.enrollmentNo));
       console.log('Valid students to be added:', validStudents);
       classDoc = new Student({
         className,
         sectionName,
+        year,
         students: validStudents
       });
+      console.log('New class document created:', classDoc);
       await classDoc.save();
     }
     res.status(200).json({ message: 'Students saved successfully!' });
