@@ -40,6 +40,7 @@ exports.getAttendence = (req, res, next) => {
 exports.postAttendence = (req, res, next) => {
     const { date, totalClasses, attendedClasses, status } = req.body;
     console.log("Received Attendance Data:", { date, totalClasses, attendedClasses, status });
+    
     const percentage = ((attendedClasses / totalClasses) * 100).toFixed(2);
     attendanceRecords.push({
         id: attendanceRecords.length + 1,
@@ -49,7 +50,7 @@ exports.postAttendence = (req, res, next) => {
         status,
         percentage,
     });
-    res.render("attendance", { 
+    res.render("home", { 
       records: attendanceRecords,
       toastMessage: { type: 'success', text: 'Attendance record added successfully!' },
       pageTitle: "Attendance Records",

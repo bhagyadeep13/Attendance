@@ -4,7 +4,7 @@ exports.getAbout = (req, res, next) => {
     console.log("Session User:", req.session.user);
     const toastMessage = req.session.toastMessage;
     req.session.toastMessage = null; // Clear the toast message after displaying it
-    res.render("store/data", {
+    res.render("store/home", {
           pageTitle: "About User",
           currentPage: "AboutUser",
           IsLoggedIn: true,
@@ -14,7 +14,6 @@ exports.getAbout = (req, res, next) => {
 };
 
 exports.getIndex = (req, res, next) => {
-    
     const user = req.session.user;
     if(!user)
     {

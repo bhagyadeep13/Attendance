@@ -10,12 +10,10 @@ exports.getAddStudent = (req, res, next) => {
     oldInput: {},
     user: req.session.user || {},
     toastMessage: req.session.toastMessage || null,
-  }
-)
-}; 
+  });
+};
 
 exports.postAddStudent = async (req, res) => {
-
   try {
     const { className, sectionName, students ,year} = req.body;
 
@@ -80,8 +78,9 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       toastMessage: toastMessage || null,
     });
   }
+
   console.log('Query parameters:', { className, sectionName, year });
-    const classDoc = await Student.findOne({ className, sectionName, year });
+  const classDoc = await Student.findOne({ className, sectionName, year });
 
     if (!classDoc || classDoc.students.length === 0) {
       return res.render('store/showStudents', {

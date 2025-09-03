@@ -80,7 +80,7 @@ app.use(express.static(path.join(rootDir, 'public')))
 
 app.use(errorsController.pageNotFound);
 
-const PORT = 3002;
+const PORT = 3001;
 
 mongoose.connect(DB_PATH).then(() => {
   console.log('Connected to Mongo');
