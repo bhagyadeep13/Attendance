@@ -74,7 +74,10 @@ app.use('/host',(req,res,next)=>{
     res.redirect('/login')
   }
 })  // pehle request me isLoggedIn == true ho tabhi next karo nhi toh "/" redirect ho
-
+// app.use("/", attendanceRoutes);
+app.get("/mark-attendance", (req, res) => {
+  res.render("markAttendance"); // your EJS file name
+});
 
 app.use(express.static(path.join(rootDir, 'public')))
 

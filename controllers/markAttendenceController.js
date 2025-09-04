@@ -21,8 +21,8 @@ exports.getmarkAttendance = async (req,res,next) =>
 
 exports.markAttendanceDetails = async (req,res,next)=>
   {
-      const {className,sectionName,subject,date} = req.body;
-      const classDoc = await student.findOne({className,sectionName})
+      const {className,sectionName,year} = req.body;
+      const classDoc = await student.findOne({className,sectionName,year})
       if(classDoc)
       {
           res.render('store/markAttendence',{
