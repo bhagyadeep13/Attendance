@@ -1,24 +1,24 @@
 <%- include('../partials/head') %>
 </head>
-<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans antialiased">
+<body class="bg-gray-50 min-h-screen font-sans">
   <%- include('../partials/nav') %>
   <%- include('../partials/toast') %>
   <%- include('../partials/animation') %>
 
   <main class="container mx-auto mt-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
-    <div class="bg-gradient-to-br from-red-200 via-yellow-100 to-indigo-100 rounded-3xl shadow-2xl p-10 sm:p-14 w-full max-w-7xl border-4 border-black">
+    <div class="bg-white shadow-xl rounded-2xl border border-gray-200 p-10 sm:p-14 w-full max-w-7xl">
 
       <!-- Welcome -->
-      <h1 class="text-5xl font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 via-teal-600 to-indigo-600 mb-10 drop-shadow-md opacity-0 animate-slide-fade-in">
-        Welcome <%= userType %> 👋 <br>
+      <h1 class="text-5xl font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 mb-10 drop-shadow-md">
+        Welcome <%= userType %> 👋
       </h1>
 
-      <hr class="border-t-4 border-indigo-300 rounded-full shadow-lg w-2/3 mx-auto mb-12">
+      <hr class="border-t-4 border-pink-400 rounded-full shadow-lg w-2/3 mx-auto mb-12">
 
       <!-- Role-Specific Features -->
       <section class="mb-16 text-center space-y-6">
-        <p class="text-xl sm:text-2xl text-gray-800 leading-relaxed bg-gradient-to-r from-lime-100 via-teal-100 to-indigo-100 rounded-xl p-6 shadow-inner border border-black font-serif italic">
-          <span class="font-extrabold text-indigo-700 text-3xl block mb-4">
+        <p class="text-xl sm:text-2xl text-gray-800 leading-relaxed bg-white rounded-xl p-6 shadow-inner border border-gray-200 font-serif italic">
+          <span class="font-extrabold text-purple-700 text-3xl block mb-4">
             Dashboard Features
           </span>
           <span class="text-gray-800" style="font-family: cursive, serif;">
@@ -27,52 +27,48 @@
         </p>
 
         <div class="overflow-x-auto">
-          <table class="min-w-full bg-gradient-to-br from-pink-100 via-yellow-50 to-blue-100 rounded-3xl shadow-2xl border-4 border-indigo-400 overflow-hidden">
+          <table class="min-w-full bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
             <thead>
-              <tr>
-                <th class="px-8 py-5 text-2xl font-bold text-white border-b-4 border-indigo-400 text-center bg-gradient-to-r from-indigo-500 via-teal-400 to-lime-400 tracking-wider shadow-2xl rounded-tl-3xl rounded-tr-3xl drop-shadow-xl">
-                  🌟 Feature
-                </th>
-                <th class="px-8 py-5 text-2xl font-bold text-white border-b-4 border-indigo-400 text-center bg-gradient-to-r from-indigo-500 via-teal-400 to-lime-400 tracking-wider shadow-2xl drop-shadow-xl">
-                  💡 Description
-                </th>
+              <tr class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white text-2xl font-bold">
+                <th class="px-8 py-5 text-center border-b border-white rounded-tl-2xl">🌟 Feature</th>
+                <th class="px-8 py-5 text-center border-b border-white rounded-tr-2xl">💡 Description</th>
               </tr>
             </thead>
             <tbody>
               <% if (userType === 'student') { %>
-                <tr class="hover:scale-105 hover:bg-pink-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-lime-700 text-center font-extrabold">📚</td>
-                  <td class="px-6 py-5 text-lg text-indigo-900 text-center font-bold">View your <span class="text-indigo-700 underline">attendance</span> & <span class="text-indigo-700 underline">courses</span></td>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">📚</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">View your <span class="text-purple-600 underline">attendance</span> & <span class="text-purple-600 underline">courses</span></td>
                 </tr>
-                <tr class="hover:scale-105 hover:bg-yellow-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-blue-700 text-center font-extrabold">📂</td>
-                  <td class="px-6 py-5 text-lg text-blue-900 text-center font-bold">Access <span class="text-blue-700 underline">resources</span></td>
+                <tr class="hover:scale-105 hover:bg-pink-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-pink-600 text-center font-extrabold">📂</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Access <span class="text-pink-500 underline">resources</span></td>
                 </tr>
               <% } %>
 
               <% if (userType === 'teacher') { %>
-                <tr class="hover:scale-105 hover:bg-green-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-teal-700 text-center font-extrabold">📝</td>
-                  <td class="px-6 py-5 text-lg text-teal-900 text-center font-bold">Mark <span class="text-teal-700 underline">attendance</span> for your classes</td>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">📝</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Mark <span class="text-purple-600 underline">attendance</span> for your classes</td>
                 </tr>
-                <tr class="hover:scale-105 hover:bg-lime-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-yellow-700 text-center font-extrabold">📘</td>
-                  <td class="px-6 py-5 text-lg text-yellow-900 text-center font-bold">Manage <span class="text-yellow-700 underline">courses</span> & <span class="text-yellow-700 underline">upload resources</span></td>
+                <tr class="hover:scale-105 hover:bg-pink-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-pink-600 text-center font-extrabold">📘</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Manage <span class="text-pink-500 underline">courses</span> & <span class="text-pink-500 underline">upload resources</span></td>
                 </tr>
               <% } %>
 
               <% if (userType === 'admin') { %>
-                <tr class="hover:scale-105 hover:bg-red-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-red-700 text-center font-extrabold">👥</td>
-                  <td class="px-6 py-5 text-lg text-red-900 text-center font-bold">Manage <span class="text-red-700 underline">users</span> (students, teachers, admins)</td>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">👥</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Manage <span class="text-purple-600 underline">users</span> (students, teachers, admins)</td>
                 </tr>
-                <tr class="hover:scale-105 hover:bg-indigo-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-indigo-700 text-center font-extrabold">📊</td>
-                  <td class="px-6 py-5 text-lg text-indigo-900 text-center font-bold">View <span class="text-indigo-700 underline">attendance reports</span> & analytics</td>
+                <tr class="hover:scale-105 hover:bg-pink-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-pink-600 text-center font-extrabold">📊</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">View <span class="text-pink-500 underline">attendance reports</span> & analytics</td>
                 </tr>
-                <tr class="hover:scale-105 hover:bg-teal-100/80 transition-all duration-300 cursor-pointer">
-                  <td class="px-6 py-5 text-3xl text-teal-700 text-center font-extrabold">🗑️</td>
-                  <td class="px-6 py-5 text-lg text-teal-900 text-center font-bold">Delete <span class="text-teal-700 underline">projects or comments</span></td>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">🗑️</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Delete <span class="text-purple-600 underline">projects or comments</span></td>
                 </tr>
               <% } %>
             </tbody>
@@ -81,17 +77,17 @@
       </section>
 
       <!-- Action Button -->
-      <div class="flex justify-center">
+      <div class="flex justify-center mt-10">
         <% if (userType === 'student') { %>
-          <a href="/attendance" class="px-10 py-4 bg-gradient-to-r from-green-500 via-teal-500 to-lime-400 text-white rounded-full shadow-xl hover:scale-105 transition-all duration-300 font-bold text-lg border-2 border-white hover:border-teal-400">
+          <a href="/attendance" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-xl hover:scale-105 transition font-bold text-lg border-2 border-white hover:border-pink-500">
             Go to My Dashboard
           </a>
         <% } else if (userType === 'teacher') { %>
-          <a href="/mark-attendance" class="px-10 py-4 bg-gradient-to-r from-yellow-500 via-pink-500 to-red-400 text-white rounded-full shadow-xl hover:scale-105 transition-all duration-300 font-bold text-lg border-2 border-white hover:border-yellow-400">
+          <a href="/mark-attendance" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-xl hover:scale-105 transition font-bold text-lg border-2 border-white hover:border-pink-500">
             Go to Teacher Panel
           </a>
         <% } else if (userType === 'admin') { %>
-          <a href="/admin" class="px-10 py-4 bg-gradient-to-r from-indigo-500 via-teal-500 to-lime-400 text-white rounded-full shadow-xl hover:scale-105 transition-all duration-300 font-bold text-lg border-2 border-white hover:border-indigo-400">
+          <a href="/admin" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-xl hover:scale-105 transition font-bold text-lg border-2 border-white hover:border-pink-500">
             Go to Admin Panel
           </a>
         <% } %>

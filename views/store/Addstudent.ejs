@@ -1,43 +1,62 @@
 <%- include('../partials/head') %>
-  </head>
-  <body>
-    <%- include('../partials/nav') %>
-    <%- include('../partials/animation') %>
-    <main class="container mx-auto p-8 rounded-lg shadow-md ">
-      <h1 class="text-3xl font-bold mb-4 text-center text-gray-800"> Register as a new User </h1>
-      <div>
-      <form action="/add-student" method="POST" class="max-w-md mx-auto">
-        <input
-          type="text"
-          name="name"
-          placeholder="Enter Your Name"
-          class="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          required/> <!--required is used to enter this value compulsorily-->
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+  
+  <!-- Navbar + Animations -->
+  <%- include('../partials/nav') %>
+  <%- include('../partials/animation') %>
 
-          <input
-          type="text"
-          name="enrollmentNo"
-          placeholder="Enter Your enrollmentNo"
-          class="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          required/> <!--required is used to enter this value compulsorily-->
+  <!-- Main Card -->
+  <main class="container mx-auto bg-white shadow-xl rounded-2xl p-10 mt-12 max-w-3xl border border-gray-200">
+    
+    <!-- Title -->
+    <h1 class="text-3xl md:text-4xl font-extrabold text-primary text-center mb-8">
+      Register as a New User
+    </h1>
 
-          <input
-          type="text"
-          name="className"
-          placeholder="Enter Your Class Name as 1year or 2year or 3year  or 4year"
-          class="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          required/> <!--required is used to enter this value compulsorily-->
+    <!-- Registration Form -->
+    <form action="/add-student" method="POST" class="space-y-5">
+      
+      <input
+        type="text"
+        name="name"
+        placeholder="Enter Your Name"
+        class="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+        required
+      />
 
-          <input
-          type="text"
-          name="sectionName"
-          placeholder="Enter Your sectionName as A, B, C etc."
-          class="w-full px-4 py-2 mb-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-          required/> <!--required is used to enter this value compulsorily-->
+      <input
+        type="text"
+        name="enrollmentNo"
+        placeholder="Enter Your Enrollment Number"
+        class="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+        required
+      />
 
-        <input type="submit" value="Add Student" class="w-full bg-red-500 text-white py-2 rounded-md hover:bg-red-600 transition duration-300" />
-      </form>
-      </div>
-    </main>
-  </body>
+      <input
+        type="text"
+        name="className"
+        placeholder="Enter Your Class Name (e.g., 1st Year, 2nd Year)"
+        class="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+        required
+      />
+
+      <input
+        type="text"
+        name="sectionName"
+        placeholder="Enter Your Section (A, B, C, etc.)"
+        class="w-full px-4 py-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
+        required
+      />
+
+      <!-- Submit Button -->
+      <button 
+        type="submit"
+        class="w-full bg-white text-black border border-gray-300 py-3 rounded-lg font-semibold hover:bg-primary hover:text-white transition duration-300"
+      >
+        Add Student
+      </button>
+    </form>
+  </main>
+</body>
 </html>

@@ -1,15 +1,26 @@
 <%- include('../partials/head') %>
-  </head>
-  <body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
-    <%- include('../partials/nav') %>
-    <%- include('../partials/toast') %>
-    <%- include('../partials/animation') %>
-    <main class="container mx-auto bg-white shadow-lg rounded-lg p-8 mt-10 max-w-6xl">
-      <h2 class="text-3xl text-red-500 font-bold text-center mb-6">
-        Page that we have to show After login:
-      </h2>
-      <div class="flex flex-wrap justify-center gap-6">
-      </div>
-    </main>
-  </body>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+  <!-- Navbar -->
+  <%- include('../partials/nav') %>
+  <%- include('../partials/toast') %>
+  <%- include('../partials/animation') %>
+
+  <!-- Main Card -->
+  <main class="container mx-auto bg-white shadow-xl rounded-2xl p-10 mt-12 max-w-6xl border border-gray-200">
+    
+    <!-- Page Title -->
+    <h2 class="text-3xl md:text-4xl font-extrabold text-primary text-center mb-8">
+      Page After Login
+    </h2>
+
+    <!-- Content Section -->
+    <div class="flex flex-wrap justify-center gap-6 text-center">
+      <p class="text-lg text-gray-600">
+        Welcome! This is the dashboard page you will see after logging in.
+      </p>
+    </div>
+
+  </main>
+</body>
 </html>

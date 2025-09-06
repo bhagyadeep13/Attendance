@@ -1,88 +1,89 @@
 <%- include('../partials/head') %>
 </head>
-<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
   <%- include('../partials/nav') %>
-  <style>
-    @keyframes slideFadeIn {
-      from {
-        opacity: 0;
-        transform: translateY(40px) scale(0.96);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-      }
-    }
-    .animate-slide-fade-in {
-      animation: slideFadeIn 2.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    }
-    main {
-      opacity: 0;
-      animation: slideFadeIn 2.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
-    }
-  </style>
-  <main class="container mx-auto flex flex-col items-center justify-center min-h-[80vh]">
-    <div class="bg-pink-100 w-full max-w-2xl rounded-3xl shadow-2xl p-10 mt-12 border-4 border-black backdrop-blur-md z-2xl">
-      <h1 class="text-4xl font-extrabold mb-8 text-center text-purple-700 drop-shadow">Register as a Faculty</h1>
-      <!-- Error Message Block -->
+  <%- include('../partials/animation') %>
+  <%- include('../partials/toast') %>
+
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-10 border border-gray-200 flex flex-col gap-6">
+
+      <!-- Title -->
+      <h1 class="text-3xl font-extrabold text-center text-purple-700 drop-shadow mb-4">
+        Faculty Registration
+      </h1>
+      <p class="text-center text-gray-600 mb-6">
+        Fill in the details below to create your faculty account.
+      </p>
+
+      <!-- Error Message -->
       <%- include('../partials/error') %>
-      <form action="/signup" method="POST" class="space-y-6">
-        <div>
-          <input type="text" name="userType" value="teacher" hidden />
-        </div>
-        <div>
+
+      <!-- Registration Form -->
+      <form action="/signup" method="POST" class="flex flex-col gap-4">
+        <input type="hidden" name="userType" value="teacher" />
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Enter Name"
+          value="<%= oldInput.name %>"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          value="<%= oldInput.email %>"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+
+        <label class="flex items-center space-x-2">
           <input
-            type="text"
-            name="name"
-            placeholder="Enter Name"
-            value="<%= oldInput.name %>"
-            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-300 bg-pink-50/50 transition placeholder:text-pink-400"
-            required
+            type="checkbox"
+            name="terms"
+            class="accent-purple-500 scale-110"
+            <%= oldInput.terms ? "checked" : "" %>
           />
-        </div>
-        <div>
-          <input
-            type="email"
-            name="email"
-            placeholder="Email Address"
-            value="<%= oldInput.email %>"
-            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 bg-blue-50/50 transition placeholder:text-blue-400"
-            required
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            name="password"
-            placeholder="Password"
-            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-300 bg-yellow-50/50 transition placeholder:text-yellow-400"
-            required
-          />
-        </div>
-        <div>
-          <input
-            type="password"
-            name="confirmPassword"
-            placeholder="Confirm Password"
-            class="w-full px-5 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-300 bg-yellow-50/50 transition placeholder:text-yellow-400"
-            required
-          />
-        </div>
-        <div>
-          <label class="flex items-center space-x-2">
-            <input name="terms" type="checkbox" class="accent-red-500 scale-110" <%= oldInput.terms ? "checked" : "" %> />
-            <span class="text-lg text-purple-700">I agree to <a href="#" class="text-red-400 underline hover:text-red-600">terms and conditions</a></span>
-          </label>
-        </div>
-        <button type="submit" class="w-full bg-gradient-to-r from-purple-500 to-pink-400 text-white py-3 rounded-lg font-bold text-lg hover:from-purple-600 hover:to-pink-500 transition duration-200">
+          <span class="text-gray-700 text-sm">
+            I agree to <a href="#" class="text-purple-600 underline hover:text-purple-800">terms and conditions</a>
+          </span>
+        </label>
+
+        <button
+          type="submit"
+          class="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition"
+        >
           Sign Up
         </button>
       </form>
-      <div class="mt-8 text-center text-lg text-purple-700">
-        Already have an account?
-        <a href="/login" class="text-red-500 hover:underline font-semibold">Login here</a>
+
+      <!-- Login Link -->
+      <div class="text-center text-gray-700 mt-4">
+        Already have an account? 
+        <a href="/login" class="text-purple-600 font-semibold hover:underline">Login here</a>
       </div>
+
     </div>
-  </main>
+  </div>
 </body>
 </html>

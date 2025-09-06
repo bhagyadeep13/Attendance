@@ -1,126 +1,85 @@
 <%- include('../partials/head') %>
-<style>
-  /* Fade-in animation for the whole card container */
-  .fade-in {
-    animation: fadeIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(40px);}
-    to { opacity: 1; transform: translateY(0);}
-  }
-
-  /* Card pop-in animation */
-  .card-animate {
-    opacity: 0;
-    transform: scale(0.8) translateY(40px);
-    animation: cardPopIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-  .card-animate:nth-child(1) { animation-delay: 0.2s;}
-  .card-animate:nth-child(2) { animation-delay: 0.4s;}
-  .card-animate:nth-child(3) { animation-delay: 0.6s;}
-  @keyframes cardPopIn {
-    to {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-    }
-  }
-
-  /* Button pulse on hover */
-  .pulse:hover {
-    animation: pulseBtn 0.5s;
-  }
-  @keyframes pulseBtn {
-    0% { transform: scale(1);}
-    50% { transform: scale(1.08);}
-    100% { transform: scale(1);}
-  }
-
-  /* Gradient background animation */
-  body {
-    background-size: 400% 400%;
-    animation: gradientBG 10s ease infinite;
-  }
-  @keyframes gradientBG {
-    0% {background-position: 0% 50%;}
-    50% {background-position: 100% 50%;}
-    100% {background-position: 0% 50%;}
-  }
-</style>
 </head>
 <%- include('../partials/nav') %>
 <%- include('../partials/animation') %>
 <%- include('../partials/toast') %>
-<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
-  <div class="flex items-center justify-center min-h-screen fade-in">
-    <div class="bg-purple-100 backdrop-blur-2xl shadow-2xl rounded-3xl w-full max-w-6xl p-12 flex flex-col gap-10 border border-purple-100 mb-20">
-      <h1 class="text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 via-pink-500 to-blue-500 text-center mb-3 drop-shadow-lg animate-bounce">Attendance Portal</h1>
-      <p class="text-center text-purple-700 mb-8 text-2xl animate-fade-in-down">Welcome! Please register or login as Teacher, Student, or Admin.</p>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+
+<body class="bg-gray-50 min-h-screen font-sans">
+  <div class="flex items-center justify-center min-h-screen">
+<div class="bg-white shadow-xl rounded-2xl w-full max-w-6xl p-10 flex flex-col gap-6 border border-gray-200 mb-12">
+  
+  <!-- Logo + Title -->
+  <div class="flex flex-col items-center text-center">
+    <!-- College Logo -->
+    <img 
+      src="https://d2lk14jtvqry1q.cloudfront.net/media/large_242_ae8e669bf4_83c65925f5.png" 
+      alt="College Logo" 
+      class="h-24 w-auto mb-3 object-contain"
+    >
+    
+    <h1 class="text-2xl font-extrabold text-primary">Computer Science Department</h1>
+    <p class="text-lg text-gray-700 mt-1 font-semibold">Attendance Portal</p>
+  </div>
+
+  <p class="text-center text-gray-600 mb-5 text-lg">
+    Welcome! Please register or login as Teacher, Student, or Admin.
+  </p>
+
+
+      <!-- Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
         <!-- Teacher Card -->
-        <div class="bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center border border-purple-100 hover:scale-105 transition-transform duration-300 card-animate">
-          <div class="bg-purple-100 rounded-full p-4 mb-3 shadow animate-spin-slow">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-7m0 0l-9-5m9 5l9-5" /></svg>
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center border border-gray-200 hover:shadow-lg transition card-animate">
+          <div class="bg-blue-100 rounded-full p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-7m0 0l-9-5m9 5l9-5" />
+            </svg>
           </div>
-          <h2 class="font-bold text-2xl mb-2 text-purple-700">Teacher</h2>
-          <div class="flex gap-3 mt-2">
+          <h2 class="font-bold text-xl mb-3 text-gray-800">Teacher</h2>
+          <div class="flex gap-3">
             <form action="/signup" method="GET">
-              <button name="userType" value="teacher" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition pulse">Register</button>
+              <button name="userType" value="teacher" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Register</button>
             </form>
             <form action="/login" method="GET">
-              <button name="userType" value="teacher" class="bg-gradient-to-r from-blue-500 to-purple-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-purple-600 transition pulse">Login</button>
+              <button name="userType" value="teacher" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Login</button>
             </form>
           </div>
         </div>
+
         <!-- Student Card -->
-        <div class="bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center border border-pink-100 hover:scale-105 transition-transform duration-300 card-animate">
-          <div class="bg-pink-100 rounded-full p-4 mb-3 shadow animate-spin-slow-reverse">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center border border-gray-200 hover:shadow-lg transition card-animate">
+          <div class="bg-green-100 rounded-full p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
           </div>
-          <h2 class="font-bold text-2xl mb-2 text-pink-500">Student</h2>
-          <div class="flex gap-3 mt-2">
+          <h2 class="font-bold text-xl mb-3 text-gray-800">Student</h2>
+          <div class="flex gap-3">
             <form action="/signup" method="GET">
-              <button name="userType" value="student" class="bg-gradient-to-r from-blue-500 to-pink-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-pink-600 transition pulse">Register</button>
+              <button name="userType" value="student" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Register</button>
             </form>
             <form action="/login" method="GET">
-              <button name="userType" value="student" class="bg-gradient-to-r from-blue-500 to-pink-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-pink-600 transition pulse">Login</button>
+              <button name="userType" value="student" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Login</button>
             </form>
           </div>
         </div>
+
         <!-- Admin Card -->
-        <div class="bg-white/80 rounded-2xl shadow-xl p-8 flex flex-col items-center border border-blue-100 hover:scale-105 transition-transform duration-300 card-animate">
-          <div class="bg-blue-100 rounded-full p-4 mb-3 shadow animate-spin-slow">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21m6-4l.75 4M4 4h16v2a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm0 0V2a2 2 0 012-2h12a2 2 0 012 2v2" /></svg>
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center border border-gray-200 hover:shadow-lg transition card-animate">
+          <div class="bg-yellow-100 rounded-full p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21m6-4l.75 4M4 4h16v2a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm0 0V2a2 2 0 012-2h12a2 2 0 012 2v2" />
+            </svg>
           </div>
-          <h2 class="font-bold text-2xl mb-2 text-blue-500">Admin</h2>
+          <h2 class="font-bold text-xl mb-3 text-gray-800">Admin</h2>
           <form action="/login" method="GET">
-              <button name="userType" value="admin" class="bg-gradient-to-r from-blue-500 to-pink-500 text-white px-5 py-2 rounded-lg font-semibold shadow hover:from-blue-600 hover:to-pink-600 transition pulse">Login</button>
-            </form>
+            <button name="userType" value="admin" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Login</button>
+          </form>
         </div>
+
       </div>
     </div>
   </div>
-  <style>
-    /* Extra animations for icons */
-    .animate-spin-slow {
-      animation: spin 4s linear infinite;
-    }
-    .animate-spin-slow-reverse {
-      animation: spinReverse 5s linear infinite;
-    }
-    @keyframes spin {
-      100% { transform: rotate(360deg);}
-    }
-    @keyframes spinReverse {
-      100% { transform: rotate(-360deg);}
-    }
-    /* Fade-in-down for subtitle */
-    .animate-fade-in-down {
-      animation: fadeInDown 1.2s both;
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-30px);}
-      to { opacity: 1; transform: translateY(0);}
-    }
-  </style>
 </body>
 </html>
