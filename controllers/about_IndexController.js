@@ -36,5 +36,6 @@ exports.getIndex = (req, res, next) => {
           IsLoggedIn: req.session.IsLoggedIn || false,
           user: req.session.user || {},
           toastMessage: toastMessage,
+          userType: user ? user.userType : '',
         });
 }

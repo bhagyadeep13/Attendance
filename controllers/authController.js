@@ -131,10 +131,17 @@ exports.postLogIn = async (req, res, next) => {
       } else {
         console.log("Student logged in successfully");
         req.session.user = student; // Store the user in the session
-        req.session.toastMessage = {type: 'success', text: 'Student LoggedIn successfully!.'};
+        const toastMessage = {type: 'success', text: 'Student LoggedIn successfully!.'};
         req.session.IsLoggedIn = true;
         await req.session.save();
-        res.redirect("/about");
+        res.render("store/index", {
+          pageTitle: "Index Page",
+          currentPage: "IndexPage",
+          IsLoggedIn: req.session.IsLoggedIn || false,
+          user: req.session.user || {},
+          toastMessage: toastMessage,
+          userType: student.userType,
+        });
       }
     }
     else
@@ -173,11 +180,17 @@ exports.postLogIn = async (req, res, next) => {
       } else {
         console.log("Teacher logged in successfully");
         req.session.user = teacher; // Store the user in the session
-        req.session.toastMessage = {type: 'success', text: 'Teacher LoggedIn successfully!.'};
+        const toastMessage = {type: 'success', text: 'Teacher LoggedIn successfully!.'};
         req.session.IsLoggedIn = true;
         await req.session.save();
-        console.log("Teacher session:", req.session);
-        res.redirect("/about");
+        res.render("store/index", {
+          pageTitle: "Index Page",
+          currentPage: "IndexPage",
+          IsLoggedIn: req.session.IsLoggedIn || false,
+          user: req.session.user || {},
+          toastMessage: toastMessage,
+          userType: teacher.userType,
+        });
       }
     }
     else
@@ -217,14 +230,20 @@ exports.postLogIn = async (req, res, next) => {
         else {
           console.log("Admin logged in successfully");
           req.session.user = admin; // Store the user in the session
-          console.log("Admin session:", req.session.user);
-          req.session.toastMessage = {type: 'success', text: 'Admin LoggedIn successfully!.'};
-          req.session.IsLoggedIn = true;
-          await req.session.save();
-          res.redirect("/about");
-        }
+        const toastMessage = {type: 'success', text: 'Admin LoggedIn successfully!.'};
+        req.session.IsLoggedIn = true;
+        await req.session.save();
+        res.render("store/index", {
+          pageTitle: "Index Page",
+          currentPage: "IndexPage",
+          IsLoggedIn: req.session.IsLoggedIn || false,
+          user: req.session.user || {},
+          toastMessage: toastMessage,
+          userType: admin.userType,
+        });
       }
     }
+  }
 
     //req.session.IsLoggedIn = true;          // me store ho jayegi 
   // get method with index page) ki request gayi localhost ko with cookie == "IsLoggedIn",true on browser

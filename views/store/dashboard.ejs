@@ -1,0 +1,179 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
+
+    <%- include('../partials/nav') %>
+    <%- include('../partials/animation') %>
+    <%- include('../partials/toast') %>
+  <div class="max-w-7xl mx-auto p-6 space-y-10">
+
+    <!-- Student Info -->
+    <div class="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl shadow-xl text-white p-6 transform hover:scale-[1.01] transition">
+      <h3 class="text-xl font-semibold mb-4">👤 Student Information</h3>
+      <div class="grid md:grid-cols-3 gap-4 text-lg">
+        <p><strong>Name:</strong> <%= name %></p>
+        <p><strong>Email:</strong> <%= email %></p>
+        <p><strong>Enrollment No:</strong> <%= student.enrollmentNo %></p>
+        <p><strong>Section:</strong> <%= student.sectionName %></p>
+        <p><strong>Year:</strong> <%= student.year %></p>
+      </div>
+    </div>
+
+    <!-- Overall Attendance -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition">
+      <div class="bg-gradient-to-r from-green-400 to-emerald-600 text-white p-3 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold">📊 Overall Attendance</h3>
+      </div>
+      <div class="flex flex-wrap gap-10 justify-center items-center">
+        
+        <!-- Stats -->
+        <div class="space-y-3 text-gray-700 text-lg">
+          <p><strong>Total Classes:</strong> <%= student.totalClass %></p>
+          <p><strong>Present:</strong> <%= student.totalPresent %></p>
+          <p><strong>Absent:</strong> <%= student.totalAbsent %></p>
+          <p><strong>Percentage:</strong>
+            <% if (student.totalClass > 0) { %>
+              <span class="font-bold text-emerald-600 text-xl">
+                <%= ((student.totalPresent / student.totalClass) * 100).toFixed(2) %> %
+              </span>
+            <% } else { %>
+              <span class="text-gray-500">N/A</span>
+            <% } %>
+          </p>
+        </div>
+
+        <!-- Overall Pie -->
+        <div class="w-72 h-72">
+          <canvas id="attendance-pie"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject-wise Attendance -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition">
+      <div class="bg-gradient-to-r from-purple-500 to-pink-600 text-white p-3 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold">📘 Subject-wise Attendance</h3>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% if (student && student.subjectTotals) { %>
+          <% student.subjectTotals.forEach((sub, index) => { 
+             let percent = sub.totalClass > 0 ? ((sub.totalPresent / sub.totalClass) * 100).toFixed(0) : 0;
+          %>
+            <div class="bg-gradient-to-br from-indigo-50 to-pink-50 border border-gray-200 p-5 rounded-2xl shadow-md hover:shadow-xl transition">
+              <div class="flex justify-between items-center mb-3">
+                <p class="font-semibold text-gray-800"><%= sub.subject %></p>
+                <span class="font-bold text-lg <%= percent >= 75 ? 'text-green-600' : 'text-red-600' %>">
+                  <%= percent %> %
+                </span>
+              </div>
+
+              <!-- Progress Bar -->
+              <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                <div class="h-3 rounded-full transition-all duration-700"
+                     style="width:<%= percent %>%; background: linear-gradient(to right, #6366f1, #ec4899)">
+                </div>
+              </div>
+
+              <!-- Subject Pie -->
+              <div class="w-40 h-40 mx-auto">
+                <canvas id="subject-pie-<%= index %>"></canvas>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Daily Attendance -->
+    <div class="bg-white rounded-2xl shadow-xl p-6 hover:shadow-2xl transition">
+      <div class="bg-gradient-to-r from-red-500 to-orange-500 text-white p-3 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold">📅 Daily Attendance</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="table-auto w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+          <thead class="bg-indigo-600 text-white text-sm uppercase">
+            <tr>
+              <th class="px-4 py-3">Date</th>
+              <th class="px-4 py-3">Subject</th>
+              <th class="px-4 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if(student.attendance && student.attendance.length > 0) { %>
+              <% student.attendance.forEach(day => { %>
+                <% day.subjects.forEach(sub => { %>
+                  <tr class="even:bg-indigo-50 text-center text-gray-700">
+                    <td class="px-4 py-3"><%= new Date(day.date).toLocaleDateString() %></td>
+                    <td class="px-4 py-3"><%= sub.subject %></td>
+                    <td class="px-4 py-3">
+                      <% if (sub.status === "Present") { %>
+                        <span class="bg-emerald-500 text-white px-3 py-1 rounded-full text-sm shadow-md">Present</span>
+                      <% } else { %>
+                        <span class="bg-rose-500 text-white px-3 py-1 rounded-full text-sm shadow-md">Absent</span>
+                      <% } %>
+                    </td>
+                  </tr>
+                <% }) %>
+              <% }) %>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Chart Scripts -->
+  <script>
+    const total = <%= student.totalClass %>;
+    const present = <%= student.totalPresent %>;
+    const absent = <%= student.totalAbsent %>;
+
+    // Overall Pie
+    if (total > 0) {
+      new Chart(document.getElementById('attendance-pie'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Present', 'Absent'],
+          datasets: [{
+            data: [present, absent],
+            backgroundColor: ['#34d399', '#f87171'],
+            borderWidth: 3,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          cutout: '70%',
+          plugins: { 
+            legend: { position: 'bottom', labels: { color: '#374151', font: { size: 14, weight: '600' } } }
+          }
+        }
+      });
+    }
+
+    // Subject-wise Pies
+    <% if (student && student.subjectTotals) { %>
+      <% student.subjectTotals.forEach((sub, index) => { %>
+        if (<%= sub.totalClass %> > 0) {
+          new Chart(document.getElementById('subject-pie-<%= index %>'), {
+            type: 'doughnut',
+            data: {
+              labels: ['Present', 'Absent'],
+              datasets: [{
+                data: [<%= sub.totalPresent %>, <%= sub.totalAbsent %>],
+                backgroundColor: ['#6366f1', '#f43f5e'],
+                borderWidth: 3,
+                borderColor: '#fff'
+              }]
+            },
+            options: {
+              cutout: '70%',
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      <% }) %>
+    <% } %>
+  </script>
+</body>
+</html>

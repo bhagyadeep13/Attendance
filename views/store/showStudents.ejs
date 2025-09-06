@@ -106,6 +106,17 @@
           <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">
             Delete Selected
           </button>
+          <button type="button" onclick="selectAllCheckboxes()" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">
+          Select All
+        </button>
+        <script>
+          function selectAllCheckboxes() {
+            document.querySelectorAll('input[type="checkbox"][name="studentIds"]').forEach(cb => {
+              if(cb.checked === false) cb.checked = true;
+              else cb.checked = false;
+            });
+          }
+        </script>
         </div>
       </form> <!-- end of delete selected form -->
 
@@ -114,10 +125,7 @@
         <input type="hidden" name="className" value="<%= selectedClass %>"> 
         <input type="hidden" name="sectionName" value="<%= selectedSection %>">
         <input type="hidden" name="year" value="<%= selectedYear %>">
-        
-        <button type="submit" class="bg-red-800 text-white px-4 py-2 rounded hover:bg-red-900">
-          Delete All
-        </button>
+
       </form>
 
     <% } else if (selectedClass && selectedSection && selectedYear) { %>

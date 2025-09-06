@@ -1,109 +1,179 @@
 <%- include('../partials/head') %>
-</head>
-<body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
-  <%- include('../partials/nav') %>
-  <%- include('../partials/animation') %>
-  <div class="max-w-5xl mx-auto bg-white p-8 rounded shadow mt-10">
-    <h1 class="text-2xl font-bold mb-6">Mark Attendance <%= IsLoggedIn ? ' (Logged In)' : ' (Logged Out)' %></h1>
+  </head>
 
-    <!-- Attendance Filter Form -->
-    <form action="/markAttendance" method="POST" class=" flex-col md:flex-row gap-4 mb-6">
-      <div class="mb-6">
-        <p class="font-semibold mb-2 text-gray-700">Select Class Name:</p>
-        <div class="flex gap-6">
-          <label class="flex items-center gap-2">
-            <input type="radio" name="className" value="CSE" checked class="accent-purple-600" /> CSE
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="radio" name="className" value="ECE" class="accent-purple-600" /> ECE
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="radio" name="className" value="ME" class="accent-purple-600" /> ME
-          </label>
-        </div>
-      </div>
-      <!-- Select Section -->
-      <div class="mb-6">
-        <p class="font-semibold mb-2 text-gray-700">Select Section Name:</p>
-        <div class="flex gap-6">
-          <label class="flex items-center gap-2">
-            <input type="radio" name="sectionName" value="A" checked class="accent-pink-500" /> A
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="radio" name="sectionName" value="B" class="accent-pink-500" /> B
-          </label>
-          <label class="flex items-center gap-2">
-            <input type="radio" name="sectionName" value="C" class="accent-pink-500" /> C
-          </label>
-        </div>
-      </div>
+  <body class="bg-gradient-to-br from-pink-200 via-yellow-100 to-blue-200 min-h-screen font-sans">
+    <%- include('../partials/nav') %>
+    <%- include('../partials/toast') %>
+      <%- include('../partials/animation') %>
+        <div class="max-w-5xl mx-auto bg-white p-8 rounded shadow mt-10">
+          <h1 class="text-2xl font-bold mb-6">Mark Attendance <%= IsLoggedIn ? ' (Logged In)' : ' (Logged Out)' %>
+          </h1>
 
-      <!-- Subject -->
-      <div>
-        <label class="block font-semibold mb-1">Subject</label>
-        <select name="subject" required class="w-full p-2 border rounded">
-          <option disabled selected>Select subject</option>
-          <option value="Maths">Maths</option>
-          <option value="Physics">Physics</option>
-          <option value="DSA">DSA</option>
-          <option value="DBMS">DBMS</option>
-        </select>
-      </div>
+          <!-- Attendance Filter Form -->
+          <form action="/showList" method="POST" class="flex-col md:flex-row gap-4 mb-6">
 
-      <!-- Date -->
-      <div>
-        <label class="block font-semibold mb-1">Select Date</label>
-        <input type="date" name="date" required class="w-full p-2 border rounded">
-      </div>
+            <!-- Class Selection -->
+            <div class="mb-6">
+              <p class="font-semibold mb-2 text-gray-700">Select Branch Name:</p>
+              <div class="flex gap-6">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="className" value="CSE" <%= selectedClass === 'CSE' ? 'checked' : '' %> class="accent-purple-600" /> CSE
+                </label>
 
-      <!-- Submit to View Students -->
-      <button type="submit" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
-        View Students
-      </button>
-    </form>
-    <table class="w-full table-auto border-collapse border border-gray-300">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border border-gray-300 px-4 py-2">s.No</th>
-            <th class="border border-gray-300 px-4 py-2">Name</th>
-            <th class="border border-gray-300 px-4 py-2">Enrollment No</th>
-            <th class="border border-gray-300 px-4 py-2">Attendance</th>
-          </tr>
-        </thead>
+              </div>
+            </div>
 
-        <% if (students && students.length > 0) { %>
-    <form action="/submitAttendance" method="POST">
-          <input type="hidden" name="className" value="<%= selectedClass %>">
-          <input type="hidden" name="sectionName" value="<%= selectedSection %>">
-          <input type="hidden" name="subject" value="<%= selectedSubject %>">
-          <input type="hidden" name="date" value="<%= selectedDate %>">
-          <tbody>
-            <% students.forEach((student, index) => { %>
-          <tr class="hover:bg-gray-50">
-          <td class="border px-4 py-2"><%= index + 1 %></td>
-          <td class="border px-4 py-2"><%= student.name %></td>
-          <td class="border px-4 py-2"><%= student.enrollmentNo %></td>
-          <td class="border px-4 py-2 text-center">
-            <label class="inline-flex items-center mr-4">
-              <input type="radio" name="attendance[<%= student._id %>]" value="Present" required class="accent-green-600" />
-              <span class="ml-1">Present</span>
-            </label>
-            <label class="inline-flex items-center">
-              <input type="radio" name="attendance[<%= student._id %>]" value="Absent" required class="accent-red-600" />
-              <span class="ml-1">Absent</span>
-            </label>
-          </td>
-          </tr>
-          <% }) %>
-          </tbody>
+            <!-- Section Selection -->
+            <div class="mb-6">
+              <p class="font-semibold mb-2 text-gray-700">Select Section Name:</p>
+              <div class="flex gap-6">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="sectionName" value="A" <%= selectedSection === 'A' ? 'checked' : '' %> class="accent-pink-500" /> A
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="sectionName" value="B" <%= selectedSection === 'B' ? 'checked' : '' %> class="accent-pink-500" /> B
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="sectionName" value="C" <%= selectedSection === 'C' ? 'checked' : '' %> class="accent-pink-500" /> C
+                </label>
+              </div>
+            </div>
+
+            <!-- Year Selection -->
+            <div class="mb-6">
+              <p class="font-semibold mb-2 text-gray-700">Select Year:</p>
+              <div class="flex gap-6">
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="year" value="I" <%= selectedYear === 'I' ? 'checked' : '' %> class="accent-indigo-600" /> I
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="year" value="II" <%= selectedYear === 'II' ? 'checked' : '' %> class="accent-indigo-600" /> II
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="year" value="III" <%= selectedYear === 'III' ? 'checked' : '' %> class="accent-indigo-600" /> III
+                </label>
+                <label class="flex items-center gap-2">
+                  <input type="radio" name="year" value="IV" <%= selectedYear === 'IV' ? 'checked' : '' %> class="accent-indigo-600" /> IV
+                </label>
+              </div>
+            </div>
+
+            <!-- Subject Selection -->
+            <!-- Subject Selection -->
+            <div>
+              <label class="block font-semibold mb-1">Subject</label>
+              <select name="subject" required class="w-full p-2 border rounded">
+                <option value="" disabled selected>Select subject</option>
+                <option value="Maths" <%= selectedSubject === 'Maths' ? 'selected' : '' %>>Maths</option>
+                <option value="Physics" <%= selectedSubject === 'Physics' ? 'selected' : '' %>>Physics</option>
+                <option value="DSA" <%= selectedSubject === 'DSA' ? 'selected' : '' %>>DSA</option>
+                <option value="DBMS" <%= selectedSubject === 'DBMS' ? 'selected' : '' %>>DBMS</option>
+              </select>
+            </div>
+
+
+            <!-- Date Auto-filled -->
+            <div>
+              <label class="block font-semibold mb-1">Date</label>
+              <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" readonly
+                class="w-full p-2 border rounded bg-gray-100 cursor-not-allowed">
+            </div>
+
+            <!-- Submit to View Students -->
+            <button type="submit" class="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+              View Students
+            </button>
+          </form>
+
+          <!-- Student List (after filter) -->
+          <table class="w-full table-auto border-collapse border border-gray-300">
+            <thead>
+              <tr class="bg-gray-200">
+                <th class="border border-gray-300 px-4 py-2">S.No</th>
+                <th class="border border-gray-300 px-4 py-2">Name</th>
+                <th class="border border-gray-300 px-4 py-2">Enrollment No</th>
+                <th class="border border-gray-300 px-4 py-2">Attendance</th>
+              </tr>
+            </thead>
+
+            <% if (students && students.length> 0) { %>
+              <form action="/submit-attendance" method="POST">
+                <input type="hidden" name="className" value="<%= selectedClass %>">
+                <input type="hidden" name="sectionName" value="<%= selectedSection %>">
+                <input type="hidden" name="year" value="<%= selectedYear %>">
+                <input type="hidden" name="subject" value="<%= selectedSubject %>">
+                <input type="hidden" name="date" value="<%= selectedDate %>">
+
+                <tbody>
+                  <% students.forEach((student, index)=> { %>
+
+                    <tr class="hover:bg-gray-50">
+                      <td class="border px-4 py-2">
+                        <%= index + 1 %>
+                      </td>
+                      <td class="border px-4 py-2">
+                        <%= student.name %>
+                      </td>
+                      <td class="border px-4 py-2">
+                        <%= student.enrollmentNo %>
+                      </td>
+                      <td class="border px-4 py-2 text-center">
+                        <label class="inline-flex items-center mr-4">
+                          <input type="radio" name="attendance[<%= student.enrollmentNo %>]" value="Present" required
+                            class="accent-green-600" />
+                          <span class="ml-1">Present</span>
+                        </label>
+                        <label class="inline-flex items-center">
+                          <input type="radio" name="attendance[<%= student.enrollmentNo %>]" value="Absent" required
+                            class="accent-red-600" />
+                          <span class="ml-1">Absent</span>
+                        </label>
+                      </td>
+                    </tr>
+                    <% }) %>
+                </tbody>
           </table>
-          <button type="submit" class="mt-6 bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-          Submit Attendance
-          </button>
-    </form>
-            <% } else if (selectedClass && selectedSection) { %>
-        <p class="text-center text-gray-500">No students found for <strong><%= selectedClass %>-<%= selectedSection %></strong>.</p>
+
+          <div class="flex align-items-center justify-between mt-4">
+            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+              Submit Attendance
+            </button>
+            <div>
+            <button type="button" onclick="selectAllPresent()"
+              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">
+              Select All Present
+            </button>
+            <script>
+              function selectAllPresent() {
+              // Select all "Present" radio buttons for each student
+              document.querySelectorAll('input[type="radio"][value="Present"]').forEach(radio => {
+                if (radio.checked === false) radio.checked = true;
+                else radio.checked = false;
+              });
+              }
+            </script>
+            <button type="button" onclick="selectAllAbsent()"
+              class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 mr-2">
+              Select All Absent
+            </button>
+            <script>
+              function selectAllAbsent() {
+              // Select all "Absent" radio buttons for each student
+              document.querySelectorAll('input[type="radio"][value="Absent"]').forEach(radio => {
+                if (radio.checked === false) radio.checked = true;
+                else radio.checked = false;
+              });
+              }
+            </script>
+          </div>
+          </div>
+          </form>
+          <% } else if (selectedClass && selectedSection) { %>
+            <p class="text-center text-gray-500">No students found for <strong>
+                <%= selectedClass %>-<%= selectedSection %>
+              </strong>.</p>
             <% } %>
-  </div>
-</body>
-</html>
+        </div>
+  </body>
+
+  </html>
