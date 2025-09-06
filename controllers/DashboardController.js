@@ -1,3 +1,4 @@
+const StudentAttendance = require('../models/StudentAttendanceSchema');
 
 const courses = [
     {
@@ -18,7 +19,7 @@ const courses = [
     { name: "OS", value: 18, total: 24 }
   ];
 
-exports.getStudentDashboard = (req, res) => 
+exports.getDashboard = (req, res) => 
 {
   res.render('student-dashboard', { 
     courses, 
@@ -29,4 +30,26 @@ exports.getStudentDashboard = (req, res) =>
     IsLoggedIn: req.session.IsLoggedIn || false,
     user: req.session.user || {},
 });
+};
+
+exports.getStudentDashboard = async (req, res) => {
+  const student = req.session.user;
+  if (!student) {
+    return res.status(401).send('Unauthorized');
+  }
+  const studentFound = await StudentAttendance.findOne({ enrollmentNo: student.enrollmentNo });
+  if (!studentFound) {
+    return res.status(404).send('Attendance record not found');
+  }
+  console.log("Student Found:", studentFound);
+  res.render('store/dashboard', { 
+    student: studentFound,
+    name : student.name,
+    email: student.email,
+    toastMessage: req.session.toastMessage || '',
+    pageTitle: "Dashboard",
+    currentPage: "Dashboard",
+    IsLoggedIn: req.session.IsLoggedIn || false,
+    user: req.session.user || {},
+  });
 };

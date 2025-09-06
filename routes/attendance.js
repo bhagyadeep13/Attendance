@@ -22,8 +22,9 @@ router.post('/showList', async (req, res) => {
         selectedSection: sectionName,
         selectedYear: year,
         selectedSubject: subject,
-             user: req.session.user || {},
-        selectedDate: date
+        user: req.session.user || {},
+        selectedDate: date,
+        toastMessage: null
       });
     }
 
@@ -32,13 +33,14 @@ router.post('/showList', async (req, res) => {
       pageTitle: 'Mark Attendance',
       IsLoggedIn: true,
        currentPage: 'Mark Attendance',
-            user: req.session.user || {},
+        user: req.session.user || {},
       students: classData.students,
       selectedClass: className,
       selectedSection: sectionName,
       selectedYear: year,
       selectedSubject: subject,
-      selectedDate: date
+      selectedDate: date,
+      toastMessage: null
     });
   } catch (err) {
     console.error(err);
@@ -166,12 +168,21 @@ router.post("/submit-attendance", async (req, res) => {
 
 // Save attendance + student updates together
 await Promise.all([newAttendance.save(), ...updatePromises]);
-
-
-    // ---------------------------
-    // 4️⃣ Response
-    // ---------------------------
-    return res.status(200).json({ message: "Attendance saved successfully!" });
+    const toastMessage = {type: 'success', text: 'Attendance saved successfully!.'};
+    req.session.toastMessage = null;
+    res.render("store/markAttendence", { 
+      selectedClass: '',
+      selectedSection: '',
+      selectedYear: '',
+      selectedSubject: '',
+      selectedDate: '',
+      pageTitle: "Mark Attendance",
+      currentPage: "Mark Attendance",
+      IsLoggedIn: true,
+      user: req.session.user || {},
+      students: [],
+      toastMessage: toastMessage
+    });
   } catch (err) {
     console.error("❌ Error saving attendance:", err);
     return res.status(500).json({ message: "Internal Server Error", error: err.message });

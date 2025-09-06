@@ -10,12 +10,16 @@ exports.getmarkAttendance = async (req,res,next) =>
       students: [],
       selectedClass: '',
       selectedSection: '',
+      selectedYear: '',
+      selectedSubject: '',
+      selectedDate: '',
       pageTitle: "Mark Attendance",
       currentPage: "Mark Attendance",
       IsLoggedIn: req.session.IsLoggedIn,
       pageTitle: "Mark Attendance",
       currentPage: "Mark_Attendance",
       user: req.session.user || {},
+      toastMessage: req.session.toastMessage || '',
     })
 }
 
