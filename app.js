@@ -9,6 +9,7 @@ const mongoDBStore = require('connect-mongodb-session')(session)
 const DB_PATH = "mongodb+srv://root:root@attend.ejtxhiz.mongodb.net/N?retryWrites=true&w=majority&appName=attend";
 
 //Local Module
+const teacherRoutes = require("./routes/teacherRoutes");
 const rootDir = require("./utils/pathUtil");
 const errorsController = require("./controllers/errors");
 const { default: mongoose } = require('mongoose');
@@ -80,7 +81,7 @@ app.get("/mark-attendance", (req, res) => {
 });
 
 app.use(express.static(path.join(rootDir, 'public')))
-
+app.use("/api/teacher", teacherRoutes);
 app.use(errorsController.pageNotFound);
 
 const PORT = 3001;

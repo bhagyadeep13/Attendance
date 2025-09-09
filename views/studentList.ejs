@@ -1,0 +1,35 @@
+<%- include("layout") %>
+
+<h1 class="text-2xl font-bold mb-4">
+  Year <%= classInfo.year %> - Section <%= classInfo.section %>
+</h1>
+
+<% if (error) { %>
+  <p class="text-red-500"><%= error %></p>
+<% } else { %>
+  <table class="w-full border-collapse border border-gray-300">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="border p-2">Enrollment No</th>
+        <th class="border p-2">Year</th>
+        <th class="border p-2">Section</th>
+        <th class="border p-2">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% students.forEach(student => { %>
+        <tr>
+          <td class="border p-2"><%= student.enrollmentNo %></td>
+          <td class="border p-2"><%= student.year %></td>
+          <td class="border p-2"><%= student.sectionName %></td>
+          <td class="border p-2">
+            <a href="/api/teacher/attendance/<%= student.enrollmentNo %>"
+              class="bg-blue-500 text-white px-3 py-1 rounded">
+              View Attendance
+            </a>
+          </td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>

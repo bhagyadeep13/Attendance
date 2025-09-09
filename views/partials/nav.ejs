@@ -19,6 +19,7 @@
         <% if (user && user.userType === 'teacher') { %>
           <li><a href="/showStudents" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Show Students</a></li>
           <li><a href="/markAttendance" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Mark Attendance</a></li>
+          <li><a href="/overallAttendance" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Overall Attendance</a></li>
         <% } %>
         <% if (user && user.userType === 'student') { %>
           <li><a href="/student-dashboard" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Student Dashboard</a></li>
@@ -60,6 +61,7 @@
         <% if (user && user.userType === 'teacher') { %>
           <li><a href="/showStudents" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Show Students</a></li>
           <li><a href="/markAttendance" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Mark Attendance</a></li>
+          <li><a href="/overallAttendance" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Overall Attendance</a></li>
         <% } %>
         <% if (user && user.userType === 'student') { %>
           <li><a href="/student-dashboard" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Student Dashboard</a></li>

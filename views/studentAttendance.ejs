@@ -1,0 +1,38 @@
+<%- include("layout") %>
+
+<h1 class="text-xl font-bold mb-4">Attendance Report</h1>
+
+<% if (error) { %>
+  <p class="text-red-500"><%= error %></p>
+<% } else { %>
+  <div class="mb-6">
+    <p><strong>Enrollment No:</strong> <%= attendance.enrollmentNo %></p>
+    <p><strong>Year:</strong> <%= attendance.year %></p>
+    <p><strong>Section:</strong> <%= attendance.sectionName %></p>
+    <p><strong>Total Classes:</strong> <%= attendance.totalClass %></p>
+    <p><strong>Present:</strong> <%= attendance.totalPresent %></p>
+    <p><strong>Absent:</strong> <%= attendance.totalAbsent %></p>
+  </div>
+
+  <h2 class="text-lg font-bold mb-2">Subject-wise Attendance</h2>
+  <table class="w-full border-collapse border border-gray-300">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="border p-2">Subject</th>
+        <th class="border p-2">Total</th>
+        <th class="border p-2">Present</th>
+        <th class="border p-2">Absent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% attendance.subjectTotals.forEach(sub => { %>
+        <tr>
+          <td class="border p-2"><%= sub.subject %></td>
+          <td class="border p-2"><%= sub.totalClass %></td>
+          <td class="border p-2"><%= sub.totalPresent %></td>
+          <td class="border p-2"><%= sub.totalAbsent %></td>
+        </tr>
+      <% }) %>
+    </tbody>
+  </table>
+<% } %>
