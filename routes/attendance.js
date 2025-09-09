@@ -1,10 +1,13 @@
-
 const express = require("express");
 const router = express.Router();
 const Attendance = require("../models/Attendance");
 const student = require("../models/student");
+const StudentAttendance = require("../models/StudentAttendanceSchema");
+const attendanceController = require("../controllers/attendanceController"); // ✅ Make sure this file exists
 
-// Route to show student list for attendance
+// ---------------------------------------------------
+// Route 1: Show student list for attendance
+// ---------------------------------------------------
 router.post('/showList', async (req, res) => {
   try {
     const { className, sectionName, year, subject, date } = req.body;
@@ -32,8 +35,8 @@ router.post('/showList', async (req, res) => {
     res.render('store/markAttendence', {
       pageTitle: 'Mark Attendance',
       IsLoggedIn: true,
-       currentPage: 'Mark Attendance',
-        user: req.session.user || {},
+      currentPage: 'Mark Attendance',
+      user: req.session.user || {},
       students: classData.students,
       selectedClass: className,
       selectedSection: sectionName,
@@ -46,14 +49,24 @@ router.post('/showList', async (req, res) => {
     console.error(err);
     res.status(500).send('Server Error');
   }
+});
 
-AttendenceRouter.get('/attendance', attendanceController.getAttendence);
-AttendenceRouter.post('/attendance', attendanceController.postAttendence);
+// ---------------------------------------------------
+// Route 2: Attendance basic routes
+// ---------------------------------------------------
+router.get('/attendance', attendanceController.getAttendence);
+router.post('/attendance', attendanceController.postAttendence);
 
-AttendenceRouter.post('/:id', (req, res) => {
+// ---------------------------------------------------
+// Route 3: Delete an attendance record by ID
+// ---------------------------------------------------
+router.post('/:id', (req, res) => {
   const id = parseInt(req.params.id);
   let attendanceRecords = [];
+
+  // filter out by id
   attendanceRecords = attendanceRecords.filter(record => record.id !== id);
+
   res.render("attendance", { 
     records: attendanceRecords,
     pageTitle: "Attendance",
@@ -64,15 +77,9 @@ AttendenceRouter.post('/:id', (req, res) => {
   });
 });
 
-// module.exports = router;
-
-
-// const express = require("express");
-// const router = express.Router();
-// const Attendance = require("../models/Attendance");
-// const Student = require("../models/StudentAttendanceSchema");
-const StudentAttendance = require("../models/StudentAttendanceSchema");
-// 📌 Submit Attendance
+// ---------------------------------------------------
+// Route 4: Submit attendance and update students
+// ---------------------------------------------------
 router.post("/submit-attendance", async (req, res) => {
   try {
     const { BranchName, year, sectionName, subject, attendance, date } = req.body;
@@ -110,82 +117,83 @@ router.post("/submit-attendance", async (req, res) => {
     // 2️⃣ Update each student's record
     // ---------------------------
     const updatePromises = Object.entries(parsedAttendance).map(
-  async ([enrollmentNo, status]) => {
-    // Step 1: Ensure student document exists
-    await StudentAttendance.updateOne(
-      { enrollmentNo },
-      {
-        $setOnInsert: {
-          enrollmentNo,
-          className: BranchName,
-          sectionName,
-          year,
-          attendance: [], 
-          subjectTotals: [] // ✅ initialize array
-        }
-      },
-      { upsert: true }
-    );
+      async ([enrollmentNo, status]) => {
+        // Step 1: Ensure student document exists
+        await StudentAttendance.updateOne(
+          { enrollmentNo },
+          {
+            $setOnInsert: {
+              enrollmentNo,
+              className: BranchName,
+              sectionName,
+              year,
+              attendance: [], 
+              subjectTotals: [] // ✅ initialize array
+            }
+          },
+          { upsert: true }
+        );
 
-    // Step 2: Ensure date entry exists
-    await StudentAttendance.updateOne(
-      { enrollmentNo, "attendance.date": { $ne: date } },
-      {
-        $push: {
-          attendance: { date, subjects: [] }
-        }
-      }
-    );
-
-    // Step 3: Push subject into that date + update overall totals
-    await StudentAttendance.updateOne(
-      { enrollmentNo, "attendance.date": date },
-      {
-        $push: {
-          "attendance.$.subjects": { subject, status }
-        },
-        $inc: {
-          totalClass: 1,
-          totalPresent: status === "Present" ? 1 : 0,
-          totalAbsent: status === "Absent" ? 1 : 0
-        }
-      }
-    );
-
-    // Step 4: Update subject-wise totals
-    await StudentAttendance.updateOne(
-      { enrollmentNo, "subjectTotals.subject": subject },
-      {
-        $inc: {
-          "subjectTotals.$.totalClass": 1,
-          "subjectTotals.$.totalPresent": status === "Present" ? 1 : 0,
-          "subjectTotals.$.totalAbsent": status === "Absent" ? 1 : 0
-        }
-      }
-    );
-
-    // Step 5: If subjectTotals entry doesn't exist → create it
-    await StudentAttendance.updateOne(
-      { enrollmentNo, "subjectTotals.subject": { $ne: subject } },
-      {
-        $push: {
-          subjectTotals: {
-            subject,
-            totalClass: 1,
-            totalPresent: status === "Present" ? 1 : 0,
-            totalAbsent: status === "Absent" ? 1 : 0
+        // Step 2: Ensure date entry exists
+        await StudentAttendance.updateOne(
+          { enrollmentNo, "attendance.date": { $ne: date } },
+          {
+            $push: {
+              attendance: { date, subjects: [] }
+            }
           }
-        }
+        );
+
+        // Step 3: Push subject into that date + update overall totals
+        await StudentAttendance.updateOne(
+          { enrollmentNo, "attendance.date": date },
+          {
+            $push: {
+              "attendance.$.subjects": { subject, status }
+            },
+            $inc: {
+              totalClass: 1,
+              totalPresent: status === "Present" ? 1 : 0,
+              totalAbsent: status === "Absent" ? 1 : 0
+            }
+          }
+        );
+
+        // Step 4: Update subject-wise totals
+        await StudentAttendance.updateOne(
+          { enrollmentNo, "subjectTotals.subject": subject },
+          {
+            $inc: {
+              "subjectTotals.$.totalClass": 1,
+              "subjectTotals.$.totalPresent": status === "Present" ? 1 : 0,
+              "subjectTotals.$.totalAbsent": status === "Absent" ? 1 : 0
+            }
+          }
+        );
+
+        // Step 5: If subjectTotals entry doesn't exist → create it
+        await StudentAttendance.updateOne(
+          { enrollmentNo, "subjectTotals.subject": { $ne: subject } },
+          {
+            $push: {
+              subjectTotals: {
+                subject,
+                totalClass: 1,
+                totalPresent: status === "Present" ? 1 : 0,
+                totalAbsent: status === "Absent" ? 1 : 0
+              }
+            }
+          }
+        );
       }
     );
-  }
-);
 
+    // Save attendance + student updates together
+    await Promise.all([newAttendance.save(), ...updatePromises]);
 
-// Save attendance + student updates together
-await Promise.all([newAttendance.save(), ...updatePromises]);
-    const toastMessage = {type: 'success', text: 'Attendance saved successfully!.'};
+    const toastMessage = { type: 'success', text: 'Attendance saved successfully!.' };
     req.session.toastMessage = null;
+
     res.render("store/markAttendence", { 
       selectedClass: '',
       selectedSection: '',
@@ -204,7 +212,5 @@ await Promise.all([newAttendance.save(), ...updatePromises]);
     return res.status(500).json({ message: "Internal Server Error", error: err.message });
   }
 });
-
-// module.exports = router;
 
 module.exports = router;

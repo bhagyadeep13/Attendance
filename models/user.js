@@ -29,7 +29,7 @@ const userSchema = mongoose.Schema({
     },
   },
 });
-// Ensure enrollmentNo is removed from non-students before saving
+// Ensure EnrollmentNo is removed from non-students before saving!!!!!!
 userSchema.pre('save', function (next) {
   if (this.userType !== 'student') {
     this.enrollmentNo = undefined;

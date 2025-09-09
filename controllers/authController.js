@@ -245,7 +245,7 @@ exports.postLogIn = async (req, res, next) => {
     }
   }
 
-    //req.session.IsLoggedIn = true;          // me store ho jayegi 
+    //req.session.IsLoggedIn = true;      // me store ho jayegi 
   // get method with index page) ki request gayi localhost ko with cookie == "IsLoggedIn",true on browser
 
 exports.postLogOut = (req, res, next) => {
@@ -416,4 +416,4 @@ exports.postSignUp = [
 
 
 // session - server ke pass store hota h (internal cokkie banake)
-// cookie - client ke pass store hota h (not use easily accessable)
+// cookie - client ke pass store hota h (not use easily accessible)

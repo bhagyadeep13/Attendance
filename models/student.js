@@ -20,7 +20,7 @@ const classSchema = new mongoose.Schema({
   students:
   [{
     name: { type: String, required: true },
-    enrollmentNo: { type: String, required: true,}  // Allows null/undefined but treats them as non-duplicates}
+    enrollmentNo: { type: String, required: true,}  // Allows null/undefined but treats them as non-duplicates
 }]
 });
 

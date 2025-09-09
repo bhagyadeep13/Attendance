@@ -1,7 +1,7 @@
-// Core Module
+//Core Module
 const path = require('path');
 const Student = require('./models/student');
-// External Module
+//External Module
 const express = require('express');
 const session = require('express-session')
 const mongoDBStore = require('connect-mongodb-session')(session)
@@ -29,6 +29,7 @@ const store = new mongoDBStore({
   collection: 'sessions'
 })
 
+
 app.use(express.urlencoded());
 
 app.use(session({
@@ -54,7 +55,7 @@ app.use(session({
   next();
 })*/
 
-app.use(express.json()); // important to parse JSON body
+app.use(express.json()); //important to parse JSON body
 
 app.use(authRouter)
 app.use(AddRouter);
@@ -63,7 +64,7 @@ app.use(aboutRouter);
 app.use(AttendenceRouter);
 app.use(studentDashboardRouter);
 
-// isLoggedIn == true ho tabhi next karo nhi toh "/" redirect ho
+// isLoggedIn == If true then next else redirect to "/"
 app.use('/host',(req,res,next)=>{
   if(req.session.IsLoggedIn)
   {

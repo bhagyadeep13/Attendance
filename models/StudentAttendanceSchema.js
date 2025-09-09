@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 const StudentAttendanceSchema = new mongoose.Schema({
   enrollmentNo: { type: String, required: true },
   sectionName: { type: String, required: true }, // A, B, C
-  year: { type: String, required: true },        // I, II, III, IV
+  year: { type: String, required: true },        // I,II,III,IV
 
-  // 🔹 Daily attendance with subjects
+  // Daily attendance with subjects
   attendance: [
     {
       date: { type: Date, required: true },
@@ -18,12 +18,12 @@ const StudentAttendanceSchema = new mongoose.Schema({
     }
   ],
 
-  // 🔹 Overall totals (all subjects combined)
+  // Overall totals (all subjects combined)
   totalClass: { type: Number, default: 0 },
   totalPresent: { type: Number, default: 0 },
   totalAbsent: { type: Number, default: 0 },
 
-  // 🔹 Subject-wise totals
+  // Subject-wise totals
   subjectTotals: [
     {
       subject: { type: String, required: true }, 
