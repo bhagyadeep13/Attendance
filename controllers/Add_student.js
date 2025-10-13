@@ -13,60 +13,47 @@ exports.getAddStudent = (req, res, next) => {
   });
 };
 
+
 exports.postAddStudent = async (req, res) => {
   try {
-    const { className, sectionName, students, year, semester } = req.body;
+    const { className, sectionName, year, semester, students, batches } = req.body;
 
-    console.log('Received data:', { className, sectionName, year, semester, students });
+    // Check if this class-section-year-semester already exists
+    const existingClass = await Student.findOne({ className, sectionName, year, semester });
 
-    // Validate required fields
-    if (!className || !sectionName || !year || !semester || !Array.isArray(students) || students.length === 0) {
-      return res.status(400).json({ message: 'Invalid or incomplete data format' });
-    }
+    if (existingClass) {
+      // Option 1: Append new students (avoid duplicates)
+      const existingEnrollments = existingClass.students.map(s => s.enrollmentNo.toUpperCase());
+      const newStudents = students.filter(s => !existingEnrollments.includes(s.enrollmentNo.toUpperCase()));
 
-    // Find class document based on className, sectionName, year, and semester
-    let classDoc = await Student.findOne({ className, sectionName, year, semester });
-
-    if (classDoc) {
-      const existingEnrollments = new Set(classDoc.students.map(s => String(s.enrollmentNo)));
-
-      // Filter out students whose enrollmentNo already exists in the class
-      const uniqueStudents = students.filter(
-        s => !existingEnrollments.has(String(s.enrollmentNo))
-      );
-      console.log('Unique students to be added:', uniqueStudents);
-
-      if (uniqueStudents.length === 0) {
-        return res.status(409).json({ message: 'All students already exist or are invalid.' });
+      if(newStudents.length === 0) {
+        return res.status(400).json({ message: 'All students already exist for this Class .' });
       }
 
-      classDoc.students.push(...uniqueStudents);
-      await classDoc.save();
+      existingClass.students.push(...newStudents);
 
-    } else {
-      // Create a new class document
-      const validStudents = students.filter(s => s.name && String(s.enrollmentNo));
-      console.log('Valid students to be added:', validStudents);
+      // Merge batches if provided
+      if(batches && batches.length > 0){
+        batches.forEach(batch => {
+          existingClass.batches.push(batch);
+        });
+      }
 
-      classDoc = new Student({
-        className,
-        sectionName,
-        year,
-        semester, // ✅ Added semester here
-        students: validStudents
-      });
-
-      console.log('New class document created:', classDoc);
-      await classDoc.save();
+      await existingClass.save();
+      return res.json({ message: `${newStudents.length} students added to existing class.` });
     }
 
-    res.status(200).json({ message: 'Students saved successfully!' });
+    // If class does not exist, create new
+    const newClass = new Student({ className, sectionName, year, semester, students, batches });
+    await newClass.save();
+
+    res.json({ message: 'Students saved successfully!' });
+
   } catch (error) {
-    console.error('Error saving students:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error(error);
+    res.status(500).json({ message: 'Failed to save students.' });
   }
 };
-
 
 exports.getStudentsByClassAndSection = async (req, res) => {
   const { className, sectionName, year } = req.query;

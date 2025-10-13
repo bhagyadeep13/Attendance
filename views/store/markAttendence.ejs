@@ -312,6 +312,85 @@
             }
         });
 
+        submitAttendanceBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    // 1. Show loading state at the start
+    document.getElementById('loading-animation').classList.remove('hidden');
+    submitAttendanceBtn.disabled = true;
+    submitAttendanceBtn.textContent = 'Submitting...';
+
+    const isLabSubject = subjectSelect.value.toLowerCase().includes('lab');
+    const attendanceData = {
+        className: document.querySelector('input[name="className"]:checked')?.value,
+        year: document.querySelector('input[name="year"]:checked')?.value,
+        semester: document.querySelector('input[name="semester"]:checked')?.value,
+        sectionName: document.querySelector('input[name="sectionName"]:checked')?.value,
+        subject: subjectSelect.value,
+        date: document.querySelector('input[name="date"]')?.value,
+        attendance: {}
+    };
+
+    if (isLabSubject) {
+        attendanceData.batch = batchSelect.value;
+    }
+
+    const attendanceRadios = document.querySelectorAll('#studentsTableBody input[type="radio"]:checked');
+    attendanceRadios.forEach(radio => {
+        const enrollmentNo = radio.name.match(/\[(.*?)\]/)[1];
+        attendanceData.attendance[enrollmentNo] = radio.value;
+    });
+
+    try {
+        const res = await fetch('/submit-attendance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(attendanceData)
+        });
+
+        if (res.ok) {
+            // 2. Success: Show toast and reset form
+            showToast('Attendance submitted successfully!', 'success');
+            resetFormAndUI();
+        } else {
+            // 3. Error: Handle message from server
+            const result = await res.json();
+            showToast('Error: ' + result.message, 'error');
+        }
+    } catch (error) {
+        // 4. Network/other error
+        console.error('Submission failed:', error);
+        showToast('An unexpected error occurred during submission.', 'error');
+    } finally {
+        // 5. Always hide loading state and re-enable button
+        document.getElementById('loading-animation').classList.add('hidden');
+        submitAttendanceBtn.disabled = false;
+        submitAttendanceBtn.textContent = 'Submit Attendance';
+    }
+});
+
+function resetFormAndUI() {
+    // Uncheck all radio buttons for class, year, etc.
+    document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+
+    // Reset select dropdowns
+    subjectSelect.selectedIndex = 0;
+    batchSelect.selectedIndex = 0;
+
+    // Hide conditional containers
+    semesterContainer.classList.add('hidden');
+    sectionContainer.classList.add('hidden');
+    batchContainer.classList.add('hidden');
+
+    // Hide the students table
+    attendanceContainer.style.display = 'none';
+    studentsTableBody.innerHTML = '';
+    noStudentsMessage.style.display = 'block';
+    noStudentsMessage.textContent = 'No students found.';
+
+    // Reset the "View Students" button state
+    viewStudentsBtn.style.display = 'block';
+}
         // Event listener for the "View Students" button (for theory classes)
         viewStudentsBtn.addEventListener('click', async (e) => {
             e.preventDefault();
@@ -397,7 +476,7 @@
                 });
                 
                 const result = await res.json();
-                
+
                 if (res.ok) {
                     alert('Attendance submitted successfully!');
                     window.location.reload();
