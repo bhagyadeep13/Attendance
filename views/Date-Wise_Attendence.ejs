@@ -1,0 +1,156 @@
+<%- include('partials/head') %>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <%- include('partials/nav') %>
+  <div class="flex items-center justify-center mt-20">
+  <div class="bg-white shadow-xl rounded-2xl p-6 w-full max-w-xl">
+    <h1 class="text-2xl font-bold text-center mb-6">Attendance Report</h1>
+    
+    <form action="/report/result" method="GET" class="space-y-4">
+
+      <!-- Branch (Fixed) -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Branch</label>
+        <input type="text" name="branchName" value="CSE" readonly class="w-full border rounded-xl p-2 bg-gray-100 cursor-not-allowed">
+      </div>
+
+      <!-- Year Selection -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Year</label>
+        <select name="year" id="yearSelect" required class="w-full border rounded-xl p-2">
+          <option value="" disabled selected>Select Year</option>
+          <option value="I">I</option>
+          <option value="II">II</option>
+          <option value="III">III</option>
+          <option value="IV">IV</option>
+        </select>
+      </div>
+
+      <!-- Semester (dynamic) -->
+      <div class="hidden" id="semesterContainer">
+        <label class="block text-sm font-medium mb-1">Semester</label>
+        <select name="semester" id="semesterSelect" required class="w-full border rounded-xl p-2"></select>
+      </div>
+
+      <!-- Section (dynamic) -->
+      <div class="hidden" id="sectionContainer">
+        <label class="block text-sm font-medium mb-1">Section</label>
+        <select name="sectionName" id="sectionSelect" required class="w-full border rounded-xl p-2"></select>
+      </div>
+
+      <!-- Subject (dynamic) -->
+      <div class="hidden" id="subjectContainer">
+        <label class="block text-sm font-medium mb-1">Subject</label>
+        <select name="subject" id="subjectSelect" required class="w-full border rounded-xl p-2"></select>
+      </div>
+
+      <!-- Date -->
+      <div>
+        <label class="block text-sm font-medium mb-1">Date</label>
+        <input type="date" name="date" required class="w-full border rounded-xl p-2">
+      </div>
+
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-xl hover:bg-blue-700">
+        Generate Report
+      </button>
+    </form>
+  </div>
+  </div>
+  <script>
+    const yearSelect = document.getElementById('yearSelect');
+    const semesterContainer = document.getElementById('semesterContainer');
+    const semesterSelect = document.getElementById('semesterSelect');
+    const sectionContainer = document.getElementById('sectionContainer');
+    const sectionSelect = document.getElementById('sectionSelect');
+    const subjectContainer = document.getElementById('subjectContainer');
+    const subjectSelect = document.getElementById('subjectSelect');
+
+    // When year changes -> fetch semesters + sections
+    yearSelect.addEventListener('change', async () => {
+      const year = yearSelect.value;
+
+      try {
+        const res = await fetch(`/get-sem-sections?branchName=CSE&year=${year}`);
+        const data = await res.json(); // Ex: [{ semester: 1, sections: ['A','B'] }, ...]
+
+        // Populate semesters
+        semesterSelect.innerHTML = `<option value="" disabled selected>Select Semester</option>`;
+        data.forEach(d => {
+          const option = document.createElement('option');
+          option.value = d.semester;
+          option.textContent = d.semester;
+          semesterSelect.appendChild(option);
+        });
+        semesterContainer.classList.remove('hidden');
+
+        // Clear sections + subjects
+        sectionSelect.innerHTML = '';
+        sectionContainer.classList.add('hidden');
+        subjectSelect.innerHTML = '';
+        subjectContainer.classList.add('hidden');
+
+      } catch(err) {
+        console.error('Error fetching semesters:', err);
+      }
+    });
+
+    // When semester changes -> populate sections
+    semesterSelect.addEventListener('change', async () => {
+      const year = yearSelect.value;
+      const semester = semesterSelect.value;
+
+      try {
+        const res = await fetch(`/get-sem-sections?branchName=CSE&year=${year}`);
+        const data = await res.json();
+        const selectedSem = data.find(d => d.semester == semester);
+
+        // Populate sections
+        sectionSelect.innerHTML = `<option value="" disabled selected>Select Section</option>`;
+        selectedSem.sections.forEach(sec => {
+          const option = document.createElement('option');
+          option.value = sec;
+          option.textContent = sec;
+          sectionSelect.appendChild(option);
+        });
+        sectionContainer.classList.remove('hidden');
+
+        // Clear subjects
+        subjectSelect.innerHTML = '';
+        subjectContainer.classList.add('hidden');
+
+      } catch(err) {
+        console.error('Error fetching sections:', err);
+      }
+    });
+
+    // When section changes -> fetch subjects
+    sectionSelect.addEventListener('change', async () => {
+      const year = yearSelect.value;
+      const semester = semesterSelect.value;
+      const sectionName = sectionSelect.value;
+
+      try {
+        const res = await fetch('/subject/get-subjects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ branchName: 'CSE', year, semester, sectionName })
+        });
+        const subjects = await res.json();
+
+        // Populate subjects
+        subjectSelect.innerHTML = `<option value="" disabled selected>Select Subject</option>`;
+        subjects.forEach(sub => {
+          const option = document.createElement('option');
+          option.value = sub.subjectName;
+          option.textContent = `${sub.subjectCode} - ${sub.subjectName}`;
+          subjectSelect.appendChild(option);
+        });
+        subjectContainer.classList.remove('hidden');
+
+      } catch(err) {
+        console.error('Error fetching subjects:', err);
+      }
+    });
+  </script>
+</body>
+</html>

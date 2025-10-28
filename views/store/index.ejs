@@ -1,0 +1,95 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+  <%- include('../partials/nav') %>
+  <%- include('../partials/toast') %>
+  <%- include('../partials/animation') %>
+
+  <main class="container mx-auto mt-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center">
+    <div class="bg-white shadow-xl rounded-2xl border border-gray-200 p-10 sm:p-14 w-full max-w-7xl">
+
+      <!-- Welcome -->
+      <h1 class="text-5xl font-extrabold text-center bg-clip-text text-transparent bg-gradient-to-r from-purple-600 via-pink-500 to-orange-400 mb-10 drop-shadow-md">
+        Welcome <%= userType %> 👋
+      </h1>
+
+      <hr class="border-t-4 border-pink-400 rounded-full shadow-lg w-2/3 mx-auto mb-12">
+
+      <!-- Role-Specific Features -->
+      <section class="mb-16 text-center space-y-6">
+        <p class="text-xl sm:text-2xl text-gray-800 leading-relaxed bg-white rounded-xl p-6 shadow-inner border border-gray-200 font-serif italic">
+          <span class="font-extrabold text-purple-700 text-3xl block mb-4">
+            Dashboard Features
+          </span>
+          <span class="text-gray-800" style="font-family: cursive, serif;">
+            Explore the available actions based on your role.
+          </span>
+        </p>
+
+        <div class="overflow-x-auto">
+          <table class="min-w-full bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
+            <thead>
+              <tr class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white text-2xl font-bold">
+                <th class="px-8 py-5 text-center border-b border-white rounded-tl-2xl">🌟 Feature</th>
+                <th class="px-8 py-5 text-center border-b border-white rounded-tr-2xl">💡 Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (userType === 'student') { %>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">📚</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">View your <span class="text-purple-600 underline">attendance</span> & <span class="text-purple-600 underline">courses</span></td>
+                </tr>
+                <tr class="hover:scale-105 hover:bg-pink-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-pink-600 text-center font-extrabold">📂</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Edit <span class="text-pink-500 underline">Profile</span></td>
+                </tr>
+              <% } %>
+
+              <% if (userType === 'teacher') { %>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">📝</td>
+                  <a href="/markAttendance">
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Mark <span class="text-purple-600 underline">attendance</span> for your classes</td></a>
+                </tr>
+                <tr class="hover:scale-105 hover:bg-pink-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-pink-600 text-center font-extrabold">📘</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Manage <span class="text-pink-500 underline">students</span> & <span class="text-pink-500 underline">Generate Report</span></td>
+                </tr>
+              <% } %>
+
+              <% if (userType === 'admin') { %>
+                <tr class="hover:scale-105 hover:bg-purple-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-purple-700 text-center font-extrabold">👥</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">Manage <span class="text-purple-600 underline">Upload Student data</span></td>
+                </tr>
+                <tr class="hover:scale-105 hover:bg-pink-50 transition-all duration-300 cursor-pointer">
+                  <td class="px-6 py-5 text-3xl text-pink-600 text-center font-extrabold">📊</td>
+                  <td class="px-6 py-5 text-lg text-gray-800 text-center font-bold">View <span class="text-pink-500 underline">Add New Admin</span> & analytics</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Action Button -->
+      <!-- <div class="flex justify-center mt-10">
+        <% if (userType === 'student') { %>
+          <button onclick="location.href='/attendance'" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-xl hover:scale-105 transition font-bold text-lg border-2 border-white hover:border-pink-500">
+            Go to My Dashboard
+          </button>
+        <% } else if (userType === 'teacher') { %>
+          <button onclick="location.href='/markAttendance'" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-xl hover:scale-105 transition font-bold text-lg border-2 border-white hover:border-pink-500">
+            Go to Teacher Panel
+          </button>
+        <% } else if (userType === 'admin') { %>
+          <button onclick="location.href='/admin'" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-500 text-white rounded-full shadow-xl hover:scale-105 transition font-bold text-lg border-2 border-white hover:border-pink-500">
+            Go to Admin Panel
+          </button>
+        <% } %>
+      </div> -->
+    </div>
+  </main>
+</body>
+</html>

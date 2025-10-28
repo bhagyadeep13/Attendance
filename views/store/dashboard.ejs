@@ -1,0 +1,209 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+
+  <%- include('../partials/nav') %>
+  <%- include('../partials/animation') %>
+  <%- include('../partials/toast') %>
+
+  <div class="max-w-7xl mx-auto p-6 space-y-10">
+
+    <!-- Student Info -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 transform hover:scale-[1.01] transition">
+      <div class="bg-gradient-to-r from-purple-500 to-pink-400 text-white p-3 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold">👤 Student Information</h3>
+      </div>
+      <div class="grid md:grid-cols-3 gap-4 text-gray-800 text-lg">
+        <p><strong>Name:</strong> <%= name %></p>
+        <p><strong>Email:</strong> <%= email %></p>
+        <p><strong>Enrollment No:</strong> <%= student.enrollmentNo %></p>
+        <p><strong>Section:</strong> <%= classInfo?.sectionName %></p>
+        <p><strong>Year:</strong> <%= classInfo?.year %></p>
+        <p><strong>Semester:</strong> <%= classInfo?.semester %></p>
+      </div>
+    </div>
+
+    <!-- Overall Attendance -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition">
+      <div class="bg-gradient-to-r from-purple-500 to-pink-400 text-white p-3 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold">📊 Overall Attendance</h3>
+      </div>
+      <div class="flex flex-wrap gap-10 justify-center items-center">
+        <div class="space-y-3 text-gray-700 text-lg">
+          <p><strong>Total Classes:</strong> <%= student.totalClass %></p>
+          <p><strong>Present:</strong> <%= student.totalPresent %></p>
+          <p><strong>Absent:</strong> <%= student.totalAbsent %></p>
+          <p><strong>Percentage:</strong>
+            <% if (student.totalClass > 0) { %>
+              <span class="font-bold text-purple-600 text-xl">
+                <%= ((student.totalPresent / student.totalClass) * 100).toFixed(2) %> %
+              </span>
+            <% } else { %>
+              <span class="text-gray-500">N/A</span>
+            <% } %>
+          </p>
+        </div>
+
+        <div class="w-72 h-72">
+          <canvas id="attendance-pie"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Subject-wise Attendance -->
+    <div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition">
+      <div class="bg-gradient-to-r from-purple-500 to-pink-400 text-white p-3 rounded-lg mb-6">
+        <h3 class="text-lg font-semibold">📘 Subject-wise Attendance</h3>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% if (student && student.subjectTotals) { %>
+          <% student.subjectTotals.forEach((sub, index) => { 
+             let percent = sub.totalClass > 0 ? ((sub.totalPresent / sub.totalClass) * 100).toFixed(0) : 0;
+          %>
+            <div class="bg-white border border-gray-200 p-5 rounded-2xl shadow-md hover:shadow-xl transition">
+              <div class="flex justify-between items-center mb-3">
+                <p class="font-semibold text-gray-800"><%= sub.subject %></p>
+                <span class="font-bold text-lg <%= percent >= 75 ? 'text-green-600' : 'text-red-600' %>">
+                  <%= percent %> %
+                </span>
+              </div>
+
+              <div class="w-full bg-gray-200 rounded-full h-3 mb-4">
+                <div class="h-3 rounded-full transition-all duration-700"
+                     style="width:<%= percent %>%; background: linear-gradient(to right, #8b5cf6, #ec4899)">
+                </div>
+              </div>
+
+              <div class="w-40 h-40 mx-auto">
+                <canvas id="subject-pie-<%= index %>"></canvas>
+              </div>
+            </div>
+          <% }) %>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Daily Attendance -->
+<div class="bg-white rounded-2xl shadow-xl border border-gray-200 p-6 hover:shadow-2xl transition">
+  <div class="bg-gradient-to-r from-purple-500 to-pink-400 text-white p-3 rounded-lg mb-6 flex items-center justify-between">
+    <h3 class="text-lg font-semibold">📅 Daily Attendance</h3>
+  </div>
+
+  <div class="overflow-x-auto">
+    <div class="mb-4 flex items-center gap-4">
+    <label for="attendanceDate" class="mr-2 font-label">Select Date:</label>
+    <input type="date" id="attendanceDate" 
+           class="p-2 rounded-lg text-gray-700 shadow-sm border border-gray-300 focus:outline-none focus:ring-2 focus:ring-purple-400" />
+  </div>
+  </div>
+    <table class="table-auto w-full border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+      <thead class="bg-purple-600 text-white text-sm uppercase">
+        <tr>
+          <th class="px-4 py-3">Date</th>
+          <th class="px-4 py-3">Subject</th>
+          <th class="px-4 py-3">Status</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceTableBody" class="text-center text-gray-700">
+        <!-- Attendance rows will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  const attendanceData = <%- JSON.stringify(student.attendance || []) %>; 
+  const tableBody = document.getElementById("attendanceTableBody");
+  const dateInput = document.getElementById("attendanceDate");
+
+  // Render attendance rows for a given date
+  function renderAttendance(date) {
+    tableBody.innerHTML = ""; // clear old rows
+
+    const selectedDay = attendanceData.find(day => {
+      return new Date(day.date).toLocaleDateString() === new Date(date).toLocaleDateString();
+    });
+
+    if (!selectedDay) {
+      tableBody.innerHTML = `<tr><td colspan="3" class="py-4 text-gray-500">No records found for this date.</td></tr>`;
+      return;
+    }
+
+    selectedDay.subjects.forEach(sub => {
+      const row = document.createElement("tr");
+      row.className = "even:bg-purple-50";
+      row.innerHTML = `
+        <td class="px-4 py-3">${new Date(selectedDay.date).toLocaleDateString()}</td>
+        <td class="px-4 py-3">${sub.subject}</td>
+        <td class="px-4 py-3">
+          ${sub.status === "Present" 
+            ? `<span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm shadow-md">Present</span>` 
+            : `<span class="bg-red-500 text-white px-3 py-1 rounded-full text-sm shadow-md">Absent</span>`
+          }
+        </td>
+      `;
+      tableBody.appendChild(row);
+    });
+  }
+
+  // Trigger when user selects a date
+  dateInput.addEventListener("change", (e) => {
+    renderAttendance(e.target.value);
+  });
+</script>
+
+  </div>
+
+  <!-- Chart Scripts -->
+  <script>
+    const total = <%= student.totalClass %>;
+    const present = <%= student.totalPresent %>;
+    const absent = <%= student.totalAbsent %>;
+
+    if (total > 0) {
+      new Chart(document.getElementById('attendance-pie'), {
+        type: 'doughnut',
+        data: {
+          labels: ['Present', 'Absent'],
+          datasets: [{
+            data: [present, absent],
+            backgroundColor: ['#34d399', '#f87171'],
+            borderWidth: 3,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          cutout: '70%',
+          plugins: { 
+            legend: { position: 'bottom', labels: { color: '#374151', font: { size: 14, weight: '600' } } }
+          }
+        }
+      });
+    }
+
+    <% if (student && student.subjectTotals) { %>
+      <% student.subjectTotals.forEach((sub, index) => { %>
+        if (<%= sub.totalClass %> > 0) {
+          new Chart(document.getElementById('subject-pie-<%= index %>'), {
+            type: 'doughnut',
+            data: {
+              labels: ['Present', 'Absent'],
+              datasets: [{
+                data: [<%= sub.totalPresent %>, <%= sub.totalAbsent %>],
+                backgroundColor: ['#8b5cf6', '#ec4899'],
+                borderWidth: 3,
+                borderColor: '#fff'
+              }]
+            },
+            options: {
+              cutout: '70%',
+              plugins: { legend: { display: false } }
+            }
+          });
+        }
+      <% }) %>
+    <% } %>
+  </script>
+
+</body>
+</html>

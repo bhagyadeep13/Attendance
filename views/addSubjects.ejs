@@ -1,0 +1,257 @@
+<%- include('partials/head') %>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans">
+  <%- include('partials/nav') %>
+  <%- include('partials/toast') %>
+
+  <div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl border border-gray-200 p-8 mt-10">
+    <h1 class="text-3xl font-extrabold mb-6 text-center text-purple-700">
+      Manage Subjects
+    </h1>
+
+    <!-- 🔍 Select Branch, Year, Semester & Section -->
+    <form id="classFilterForm" class="flex flex-col gap-6 mb-8">
+      <!-- Branch (fixed to CSE) -->
+      <div>
+        <p class="font-semibold mb-2 text-gray-700">Select Branch:</p>
+        <select id="branchSelect" class="p-2 border rounded-lg w-32">
+          <option value="CSE">CSE</option>
+        </select>
+      </div>
+
+      <!-- Year -->
+      <div>
+        <p class="font-semibold mb-2 text-gray-700">Select Year:</p>
+        <div class="flex gap-6">
+          <label><input type="radio" name="year" value="I" class="accent-indigo-600"> I</label>
+          <label><input type="radio" name="year" value="II" class="accent-indigo-600"> II</label>
+          <label><input type="radio" name="year" value="III" class="accent-indigo-600"> III</label>
+          <label><input type="radio" name="year" value="IV" class="accent-indigo-600"> IV</label>
+        </div>
+      </div>
+
+      <!-- Semester -->
+      <div>
+        <p class="font-semibold mb-2 text-gray-700">Select Semester:</p>
+        <select id="semesterSelect" class="p-2 border rounded-lg w-32"></select>
+      </div>
+
+      <!-- Section -->
+      <div>
+        <p class="font-semibold mb-2 text-gray-700">Select Section:</p>
+        <select id="sectionSelect" class="p-2 border rounded-lg w-32"></select>
+      </div>
+    </form>
+
+    <!-- 📚 Subject List Editor -->
+    <div id="subjectManager" class="hidden">
+      <h2 class="text-xl font-bold mb-4 text-purple-600">Subjects for this Class</h2>
+
+      <table class="w-full border border-gray-300 rounded-xl overflow-hidden">
+        <thead class="bg-gradient-to-r from-purple-500 to-pink-500 text-white">
+          <tr>
+            <th class="py-2 px-3 text-left">Subject Code</th>
+            <th class="py-2 px-3 text-left">Subject Name</th>
+            <th class="py-2 px-3"></th>
+          </tr>
+        </thead>
+        <tbody id="subjectTableBody"></tbody>
+      </table>
+
+      <!-- Add Subject Form -->
+      <div class="flex gap-4 mt-4">
+        <input type="text" id="subjectCodeInput" placeholder="Subject Code"
+          class="flex-1 p-2 border rounded-lg focus:ring focus:ring-purple-400" />
+        <input type="text" id="subjectNameInput" placeholder="Subject Name"
+          class="flex-1 p-2 border rounded-lg focus:ring focus:ring-purple-400" />
+        <button type="button" onclick="addSubject()" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600">
+          ➕ Add
+        </button>
+      </div>
+
+      <button id="saveSubjectsBtn" class="w-full mt-6 bg-blue-500 text-white py-3 rounded-xl font-bold shadow hover:bg-white hover:text-blue-500 border transition-all duration-200">
+        💾 Save Subjects
+      </button>
+    </div>
+  </div>
+
+<script>
+  const branchSelect = document.getElementById('branchSelect');
+  const yearRadios = document.querySelectorAll('input[name="year"]');
+  const semesterSelect = document.getElementById('semesterSelect');
+  const sectionSelect = document.getElementById('sectionSelect');
+  const subjectManager = document.getElementById('subjectManager');
+  const subjectTableBody = document.getElementById('subjectTableBody');
+
+  let addedSubjects = []; // new subjects to add
+  let existingSubjects = []; // already saved in DB
+  const selectedClass = { branchName: 'CSE', year: null, semester: null, sectionName: null };
+
+  // Load semesters & sections from backend
+  async function loadSemestersAndSections() {
+    if (!selectedClass.year) return;
+    try {
+      const res = await fetch(`/get-sem-sections?branchName=${selectedClass.branchName}&year=${selectedClass.year}`);
+      const data = await res.json();
+      if(!data || data.length === 0){
+        semesterSelect.innerHTML = '<option value="">No Semesters</option>';
+        sectionSelect.innerHTML = '<option value="">No Sections</option>';
+        return;
+      }
+
+      semesterSelect.innerHTML = '';
+      data.forEach(item => {
+        const opt = document.createElement('option');
+        opt.value = item.semester;
+        opt.textContent = "Semester " + item.semester;
+        semesterSelect.appendChild(opt);
+      });
+
+      populateSections(data[0].sections || []);
+    } catch(err) {
+      console.error("Failed to load semesters/sections:", err);
+    }
+  }
+
+  function populateSections(sections) {
+    sectionSelect.innerHTML = '';
+    sections.forEach(sec => {
+      const opt = document.createElement('option');
+      opt.value = sec;
+      opt.textContent = sec;
+      sectionSelect.appendChild(opt);
+    });
+
+    selectedClass.semester = semesterSelect.value;
+    selectedClass.sectionName = sectionSelect.value;
+    subjectManager.classList.remove('hidden');
+
+    fetchExistingSubjects(); // load subjects from backend
+  }
+
+  yearRadios.forEach(radio => {
+    radio.addEventListener('change', e => {
+      selectedClass.year = e.target.value;
+      loadSemestersAndSections();
+    });
+  });
+
+  semesterSelect.addEventListener('change', () => {
+    selectedClass.semester = semesterSelect.value;
+    fetchExistingSubjects();
+  });
+
+  sectionSelect.addEventListener('change', () => {
+    selectedClass.sectionName = sectionSelect.value;
+    fetchExistingSubjects();
+  });
+
+  // Render subjects table
+  function renderSubjectTable() {
+    subjectTableBody.innerHTML = '';
+
+    // Existing subjects from DB
+    existingSubjects.forEach((sub, idx) => {
+      subjectTableBody.innerHTML += `
+        <tr class="border-b">
+          <td class="px-3 py-2">${sub.subjectCode}</td>
+          <td class="px-3 py-2">${sub.subjectName}</td>
+          <td class="px-3 py-2 text-right">
+            <button onclick="deleteSubjectFromDB('${sub._id}')" class="text-red-500 hover:underline">🗑 Delete</button>
+          </td>
+        </tr>`;
+    });
+
+    // Newly added subjects (not yet saved)
+    addedSubjects.forEach((sub, idx) => {
+      subjectTableBody.innerHTML += `
+        <tr class="border-b">
+          <td class="px-3 py-2">${sub.subjectCode}</td>
+          <td class="px-3 py-2">${sub.subjectName}</td>
+          <td class="px-3 py-2 text-right">
+            <button onclick="removeSubject(${idx})" class="text-orange-500 hover:underline">🗑 Remove</button>
+          </td>
+        </tr>`;
+    });
+  }
+
+  function addSubject() {
+    const code = document.getElementById('subjectCodeInput').value.trim();
+    const name = document.getElementById('subjectNameInput').value.trim();
+    if(!code || !name) return alert("⚠ Enter both subject code & name");
+
+    addedSubjects.push({ subjectCode: code, subjectName: name });
+    document.getElementById('subjectCodeInput').value = '';
+    document.getElementById('subjectNameInput').value = '';
+    renderSubjectTable();
+  }
+
+  function removeSubject(idx) {
+    addedSubjects.splice(idx, 1);
+    renderSubjectTable();
+  }
+
+  async function fetchExistingSubjects() {
+    if(!selectedClass.branchName || !selectedClass.year || !selectedClass.semester || !selectedClass.sectionName) return;
+
+    try {
+      const res = await fetch('/subject/get-subjects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(selectedClass)
+      });
+      existingSubjects = await res.json(); // should return array with _id, subjectCode, subjectName
+      renderSubjectTable();
+    } catch(err) {
+      console.error("Failed to fetch subjects:", err);
+    }
+  }
+
+  async function deleteSubjectFromDB(subjectId) {
+    if(!confirm("Are you sure you want to delete this subject?")) return;
+
+    try {
+      const res = await fetch(`/subject/delete/${subjectId}`, { method: 'DELETE' });
+      if(res.ok) {
+        existingSubjects = existingSubjects.filter(s => s._id !== subjectId);
+        renderSubjectTable();
+      } else {
+        const data = await res.json();
+        alert("❌ Error: " + data.error);
+      }
+    } catch(err) {
+      console.error(err);
+      alert("❌ Server error");
+    }
+  }
+
+  document.getElementById('saveSubjectsBtn').addEventListener('click', async () => {
+    if(!selectedClass.branchName || !selectedClass.year || !selectedClass.semester || !selectedClass.sectionName)
+      return alert("⚠ Select branch, year, semester & section");
+    if(addedSubjects.length === 0) return alert("⚠ Add at least one subject");
+
+    try {
+      const res = await fetch('/subject/add-subjects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...selectedClass, subjects: addedSubjects })
+      });
+
+      const data = await res.json();
+      if(res.ok) {
+        alert("✅ Subjects saved successfully!");
+        addedSubjects = [];
+        fetchExistingSubjects();
+      } else {
+        alert("❌ Error: " + data.error);
+      }
+    } catch(err) {
+      console.error(err);
+      alert("❌ Server error");
+    }
+  });
+</script>
+
+</body>
+</html>

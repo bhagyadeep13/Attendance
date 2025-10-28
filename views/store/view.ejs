@@ -1,0 +1,163 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+  <%- include('../partials/nav') %>
+  <%- include('../partials/animation') %>
+  <%- include('../partials/toast') %>
+
+  <div class="flex items-center justify-center mt-20 p-4">
+    <div class="bg-white shadow-xl rounded-2xl w-full max-w-4xl p-10 flex flex-col gap-6 border border-gray-200">
+
+      <h1 class="text-3xl font-extrabold mb-6 text-center text-blue-700">
+        Attendance Report
+      </h1>
+
+      <!-- Filter Form -->
+      <form id="attendanceForm" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Branch -->
+        <div>
+          <label for="branchName" class="block mb-1 font-semibold text-gray-700">Branch</label>
+          <select name="branchName" id="branchName" required
+            class="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-sm">
+            <option value="">-- Select Branch --</option>
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="ME">ME</option>
+          </select>
+        </div>
+
+        <!-- Year -->
+        <div>
+          <label for="year" class="block mb-1 font-semibold text-gray-700">Year</label>
+          <select name="year" id="year" required
+            class="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-400 shadow-sm">
+            <option value="">-- Select Year --</option>
+            <option value="I">I</option>
+            <option value="II">II</option>
+            <option value="III">III</option>
+            <option value="IV">IV</option>
+          </select>
+        </div>
+
+        <!-- Semester -->
+        <div>
+          <label for="semester" class="block mb-1 font-semibold text-gray-700">Semester</label>
+          <select name="semester" id="semester" required
+            class="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-green-400 shadow-sm">
+            <option value="">-- Select Semester --</option>
+          </select>
+        </div>
+
+        <!-- Section -->
+        <div>
+          <label for="sectionName" class="block mb-1 font-semibold text-gray-700">Section</label>
+          <select name="sectionName" id="sectionName" required
+            class="w-full p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-pink-400 shadow-sm">
+            <option value="">-- Select Section --</option>
+          </select>
+        </div>
+
+        <!-- Apply & Reset -->
+        <div class="flex gap-3 col-span-full justify-center">
+          <button type="submit"
+            class="bg-blue-500 text-white px-6 py-2 rounded-xl shadow hover:bg-white hover:text-blue-500 border transition-all duration-200">
+            Apply
+          </button>
+          <button type="button" id="downloadBtn"
+            class="bg-green-500 text-white px-6 py-2 rounded-xl shadow hover:bg-white hover:text-green-600 border transition-all duration-200">
+            ⬇ Download
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const branchEl = document.getElementById("branchName");
+    const yearEl = document.getElementById("year");
+    const semesterEl = document.getElementById("semester");
+    const sectionEl = document.getElementById("sectionName");
+
+    let semesterData = [];
+
+    async function fetchSemestersAndSections() {
+      const branch = branchEl.value;
+      const year = yearEl.value;
+
+      if (!branch || !year) {
+        semesterEl.innerHTML = '<option value="">-- Select Semester --</option>';
+        sectionEl.innerHTML = '<option value="">-- Select Section --</option>';
+        semesterData = [];
+        return;
+      }
+
+      try {
+        const response = await fetch(`/get-sem-sections?branchName=${branch}&year=${year}`);
+        semesterData = await response.json();
+
+        semesterEl.innerHTML = '<option value="">-- Select Semester --</option>';
+        semesterData.forEach(item => {
+          const opt = document.createElement("option");
+          opt.value = item.semester;
+          opt.textContent = `Semester ${item.semester}`;
+          semesterEl.appendChild(opt);
+        });
+
+        sectionEl.innerHTML = '<option value="">-- Select Section --</option>';
+      } catch (err) {
+        console.error("Error fetching semesters/sections:", err);
+      }
+    }
+
+    semesterEl.addEventListener("change", () => {
+      const selectedSem = semesterEl.value;
+      const selectedObj = semesterData.find(item => item.semester === selectedSem);
+
+      sectionEl.innerHTML = '<option value="">-- Select Section --</option>';
+      if (selectedObj) {
+        selectedObj.sections.forEach(sec => {
+          const opt = document.createElement("option");
+          opt.value = sec;
+          opt.textContent = sec;
+          sectionEl.appendChild(opt);
+        });
+      }
+    });
+
+    branchEl.addEventListener("change", fetchSemestersAndSections);
+    yearEl.addEventListener("change", fetchSemestersAndSections);
+
+    document.getElementById("attendanceForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const branch = branchEl.value;
+      const year = yearEl.value;
+      const semester = semesterEl.value;
+      const section = sectionEl.value;
+
+      if (!branch || !year || !semester || !section) {
+        alert("⚠ Please select all fields.");
+        return;
+      }
+
+      window.location.href = `/attendance/${branch}/${year}/${semester}/${section}`;
+    });
+
+    document.getElementById("downloadBtn").addEventListener("click", function () {
+      const branch = branchEl.value;
+      const year = yearEl.value;
+      const semester = semesterEl.value;
+      const section = sectionEl.value;
+
+      if (!branch || !year || !semester || !section) {
+        alert("⚠ Please select all fields to download report.");
+        return;
+      }
+
+      window.location.href = `/attendance/${branch}/${year}/${semester}/${section}/download`;
+    });
+  </script>
+</body>
+</html> 
+
+

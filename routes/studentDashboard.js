@@ -1,0 +1,9 @@
+const express = require('express');
+const studentDashboardRouter = express.Router();
+const studentDashboardController = require('../controllers/DashboardController');
+
+studentDashboardRouter.get('/student-dashboard', studentDashboardController.getStudentDashboard);
+studentDashboardRouter.get('/dashboard', studentDashboardController.getDashboard);
+
+studentDashboardRouter.get("/get-sem-sections", studentDashboardController.getSemestersAndSections);
+module.exports = studentDashboardRouter;

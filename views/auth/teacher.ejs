@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AttendEase - Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/custom.css"><!-- optional -->
+</head>
+<body class="min-h-screen bg-gray-100 text-gray-800 font-sans">
+
+<div class="min-h-screen flex">
+  <!-- Main Area -->
+  <div class="flex-1 flex flex-col">
+    
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-10">
+      <div class="flex items-center space-x-4">
+        <div class="bg-indigo-600 text-white rounded-full w-10 h-10 flex items-center justify-center text-lg font-bold">AE</div>
+        <h1 class="text-xl font-semibold text-gray-700">ATTEND EASE</h1>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <span class="absolute left-3 top-2 text-gray-400">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </span>
+          <input type="text" placeholder="Search..."
+                 class="pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none"/>
+        </div>
+        <div class="flex items-center space-x-4">
+          <span class="text-gray-500">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+            </svg>
+          </span>
+          <img src="/api/placeholder/40/40" alt="Teacher" class="rounded-full w-10 h-10"/>
+        </div>
+      </div>
+    </header>
+
+    <!-- Tabs -->
+    <div class="bg-gray-50 p-4 flex space-x-4 border-b">
+      <button class="px-4 py-2 rounded-md transition-all duration-200 <%= activeTab === 'students' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border' %>"
+              onclick="window.location.href='/teacher/students'">Students</button>
+      <button class="px-4 py-2 rounded-md transition-all duration-200 <%= activeTab === 'calendar' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border' %>"
+              onclick="window.location.href='/teacher/calendar'">Calendar</button>
+      <button class="px-4 py-2 rounded-md transition-all duration-200 <%= activeTab === 'reports' ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border' %>"
+              onclick="window.location.href='/teacher/reports'">Reports</button>
+    </div>
+
+    <!-- Main -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <% if (activeTab === 'students') { %>
+        <!-- Class Selection -->
+        <div class="bg-white rounded-lg shadow p-6 mb-6 animate-fadeIn">
+          <h3 class="text-lg font-semibold mb-4">Select Class and Section</h3>
+          <form method="GET" action="/teacher/students" class="flex flex-wrap gap-4 items-end">
+            <div class="flex flex-col">
+              <label for="classSelect" class="mb-1">Class</label>
+              <select id="classSelect" name="class" class="border border-gray-300 rounded px-3 py-2">
+                <option value="">Select Class</option>
+                <% classOptions.forEach(classOption => { %>
+                <option value="<%= classOption %>" <%= selectedClass === classOption ? 'selected' : '' %>><%= classOption %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="flex flex-col">
+              <label for="sectionSelect" class="mb-1">Section</label>
+              <select id="sectionSelect" name="section" class="border border-gray-300 rounded px-3 py-2" <%= selectedClass ? '' : 'disabled' %>>
+                <option value="">Select Section</option>
+                <% if (selectedClass) {
+                  sectionOptions.forEach(sectionOption => { %>
+                <option value="<%= sectionOption %>" <%= selectedSection === sectionOption ? 'selected' : '' %>><%= sectionOption %></option>
+                <% }) } %>
+              </select>
+            </div>
+            <button type="submit"
+                    class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-all"
+                    <%= selectedClass && selectedSection ? '' : 'disabled class="btn-disabled"' %>>
+              View Students
+            </button>
+          </form>
+        </div>
+
+        <!-- Student Table -->
+        <% if (students && students.length > 0) { %>
+        <div class="bg-white rounded-lg shadow p-6 animate-fadeIn">
+          <h3 class="text-lg font-semibold mb-4">Student List - <%= selectedClass %> <%= selectedSection %></h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full table-auto text-sm text-left">
+              <thead>
+              <tr class="bg-gray-100 text-gray-700">
+                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2">Attendance</th>
+                <th class="px-4 py-2">Action</th>
+              </tr>
+              </thead>
+              <tbody>
+              <% students.forEach(student => {
+                const progressClass = student.attendance > 90 ? 'bg-green-500' :
+                                      student.attendance > 80 ? 'bg-yellow-400' :
+                                      student.attendance > 70 ? 'bg-orange-400' :
+                                      'bg-red-500'; %>
+              <tr class="border-b hover:bg-gray-50 transition-all duration-200">
+                <td class="px-4 py-3">
+                  <div class="flex items-center space-x-3">
+                    <div class="bg-indigo-100 text-indigo-700 rounded-full w-8 h-8 flex items-center justify-center font-semibold text-sm">
+                      <%= student.name[0] %>
+                    </div>
+                    <div>
+                      <p class="font-medium"><%= student.name %></p>
+                      <p class="text-gray-500 text-xs">RollNo: <%= student.rollNo %></p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <span class="font-medium mr-2"><%= student.attendance %>%</span>
+                  <div class="w-32 h-2 bg-gray-200 rounded-full">
+                    <div class="h-2 rounded-full <%= progressClass %>" style="width: <%= student.attendance %>%"></div>
+                  </div>
+                </td>
+                <td class="px-4 py-3">
+                  <button class="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 transition">View Details</button>
+                </td>
+              </tr>
+              <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <% } else if (selectedClass && selectedSection) { %>
+        <p class="text-center text-gray-600 mt-8">No students found for <%= selectedClass %> <%= selectedSection %>.</p>
+        <% } else { %>
+        <p class="text-center text-gray-600 mt-8">Please select a class and section, then click "View Students".</p>
+        <% } %>
+
+      <% } else if (activeTab === 'calendar') { %>
+      <div class="text-center mt-12 animate-fadeIn">
+        <h3 class="text-xl font-semibold mb-2">Calendar Tab</h3>
+        <p class="text-gray-600">Calendar and scheduling tools will appear here.</p>
+      </div>
+      <% } else if (activeTab === 'reports') { %>
+      <div class="text-center mt-12 animate-fadeIn">
+        <h3 class="text-xl font-semibold mb-2">Reports Tab</h3>
+        <p class="text-gray-600">Analytics and reporting tools will appear here.</p>
+      </div>
+      <% } %>
+    </main>
+  </div>
+</div>
+
+</body>
+</html>

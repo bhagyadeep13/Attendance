@@ -1,0 +1,63 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+  <%- include('../partials/nav') %>
+  <%- include('../partials/animation') %>
+  <%- include('../partials/toast') %>
+
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-10 border border-gray-200 flex flex-col gap-6">
+
+      <!-- Title -->
+      <h1 class="text-3xl font-extrabold text-center text-purple-700 drop-shadow mb-4">
+        Admin Login
+      </h1>
+      <p class="text-center text-gray-600 mb-6">
+        Enter your credentials to access the admin dashboard.
+      </p>
+
+      <!-- Error Message -->
+      <%- include('../partials/error') %>
+
+      <!-- Login Form -->
+      <form action="/login" method="POST" class="flex flex-col gap-4">
+        <input type="hidden" name="userType" value="admin" />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter Your Email"
+          value="<%= oldInput.email %>"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Enter Your Password"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 transition"
+        />
+
+        <button
+          type="submit"
+          class="w-full bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition"
+        >
+          Login
+        </button>
+      </form>
+
+      <!-- Signup Link -->
+      <!-- <div class="flex items-center justify-center gap-2">
+        Don't have an account? 
+        <form action="/signup" class="text-purple-600 font-semibold hover:underline">
+          <input type="text" hidden name="userType" value="admin" />
+          <button type="submit">Sign up</button>
+        </form>
+      </div> -->
+
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,155 @@
+<%- include('partials/head') %>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <%- include('partials/nav') %>
+  <!-- 🔹 Title -->
+  <div class="text-center mt-6">
+    <h2 class="text-3xl font-bold text-indigo-800">Attendance Report</h2>
+    <p class="text-gray-600 mt-1">
+      Section <b><%= sectionName %></b> | Year <b><%= year %></b>
+    </p>
+  </div>
+
+  <!-- 🔹 Filter Section -->
+  <div class="max-w-7xl mx-auto bg-white p-4 mt-4 rounded-lg shadow">
+    <h3 class="text-lg font-semibold mb-2">🔍 Filter Students</h3>
+    <div class="flex flex-wrap gap-4 items-end">
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Subject</label>
+        <select id="subject" class="border rounded px-3 py-2">
+          <option value="Overall">Overall</option>
+          <% if (subjects && subjects.length > 0) { %>
+            <% subjects.forEach(sub => { %>
+              <option value="<%= sub.subject %>"><%= sub.subjectCode %> - <%= sub.subjectName %></option>
+            <% }) %>
+          <% } %>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Min %</label>
+        <input type="number" id="min" value="0" min="0" max="100" class="border rounded px-3 py-2 w-20">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700">Max %</label>
+        <input type="number" id="max" value="100" min="0" max="100" class="border rounded px-3 py-2 w-20">
+      </div>
+
+      <button onclick="applyFilter()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
+        Apply
+      </button>
+      <button onclick="resetFilter()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
+        Reset
+      </button>
+      <button onclick="downloadReport()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+        ⬇ Download
+      </button>
+    </div>
+  </div>
+
+  <!-- 🔹 Attendance Table -->
+  <div class="max-w-7xl mx-auto bg-white p-4 mt-4 rounded-lg shadow overflow-x-auto">
+    <table id="attendanceTable" class="min-w-full border text-xs">
+      <thead class="bg-indigo-100 text-indigo-900">
+        <tr>
+          <th class="border px-2 py-1">S.No</th>
+          <th class="border px-2 py-1">Enrollment</th>
+      
+          <% subjects.forEach(sub => { %>
+        
+            <th colspan="4" class="border px-2 py-1 text-center"><%= sub.subject %></th>
+          <% }) %>
+          <th colspan="3" class="border px-2 py-1 text-center">Overall</th>
+        </tr>
+        <tr>
+          <th class="border px-2 py-1"></th>
+          <th class="border px-2 py-1"></th>
+          <% subjects.forEach(() => { %>
+            <th class="border px-2 py-1">Total</th>
+            <th class="border px-2 py-1">Present</th>
+            <th class="border px-2 py-1">Absent</th>
+            <th class="border px-2 py-1">%</th>
+          <% }) %>
+          <th class="border px-2 py-1">Total</th>
+          <th class="border px-2 py-1">Attended</th>
+          <th class="border px-2 py-1">%</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% students.forEach((stu, index) => { %>
+          <tr class="hover:bg-gray-50">
+            <td class="border px-2 py-1"><%= index + 1 %></td>
+            <td class="border px-2 py-1"><%= stu.enrollmentNo %></td>
+
+            <% subjects.forEach(sub => {
+              const subData = stu.subjectTotals.find(s => s.subject === sub.subject);
+            %>
+              <% if (subData) { %>
+                <td class="border px-2 py-1"><%= subData.totalClass %></td>
+                <td class="border px-2 py-1"><%= subData.totalPresent %></td>
+                <td class="border px-2 py-1"><%= subData.totalAbsent %></td>
+                <td class="border px-2 py-1 subject-percent" data-subject="<%= sub.subject %>"><%= subData.percentage %></td>
+              <% } else { %>
+                <td colspan="4" class="border px-2 py-1 text-gray-400 text-center">-</td>
+              <% } %>
+            <% }) %>
+
+            <td class="border px-2 py-1"><%= stu.totalClass %></td>
+            <td class="border px-2 py-1"><%= stu.totalPresent %></td>
+            <td class="border px-2 py-1 overall-percent"><%= stu.overallPercentage %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="text-center mt-4">
+    <a href="/" class="text-indigo-600 hover:underline">⬅ Back</a>
+  </div>
+
+  <script>
+    function applyFilter() {
+      const subject = document.getElementById("subject").value;
+      const min = parseFloat(document.getElementById("min").value) || 0;
+      const max = parseFloat(document.getElementById("max").value) || 100;
+
+      document.querySelectorAll("#attendanceTable tbody tr").forEach(row => {
+        let percent = 0;
+        if (subject === "Overall") {
+          const cell = row.querySelector(".overall-percent");
+          percent = cell ? parseFloat(cell.textContent) || 0 : 0;
+        } 
+        row.style.display = (!isNaN(percent) && percent >= min && percent <= max) ? "" : "none";
+      });
+    }
+
+    function resetFilter() {
+      document.getElementById("min").value = 0;
+      document.else {
+          const cell = row.querySelector(`.subject-percent[data-subject='${subject}']`);
+          percent = cell ? parseFloat(cell.textContent) || 0 : 0;
+        }getElementById("max").value = 100;
+      document.getElementById("subject").value = "Overall";
+      document.querySelectorAll("#attendanceTable tbody tr").forEach(row => row.style.display = "");
+    }
+
+    function downloadReport() {
+      const table = document.getElementById("attendanceTable");
+      const clone = table.cloneNode(true);
+
+      // Remove hidden rows before exporting
+      clone.querySelectorAll("tbody tr").forEach(row => {
+        if (row.style.display === "none") row.remove();
+      });
+
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(clone);
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance Report");
+      XLSX.writeFile(wb, "Attendance_Report.xlsx");
+    }
+  </script>
+
+</body>
+</html>

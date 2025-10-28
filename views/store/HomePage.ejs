@@ -1,0 +1,85 @@
+<%- include('../partials/head') %>
+</head>
+<%- include('../partials/nav') %>
+<%- include('../partials/animation') %>
+<%- include('../partials/toast') %>
+
+<body class="bg-gray-50 min-h-screen font-sans">
+  <div class="flex items-center justify-center min-h-screen">
+<div class="bg-white shadow-xl rounded-2xl w-full max-w-6xl p-10 flex flex-col gap-6 border border-gray-200 mb-12">
+  
+  <!-- Logo + Title -->
+  <div class="flex flex-col items-center text-center">
+    <!-- College Logo -->
+    <img 
+      src="https://d2lk14jtvqry1q.cloudfront.net/media/large_242_ae8e669bf4_83c65925f5.png" 
+      alt="College Logo" 
+      class="h-24 w-auto mb-3 object-contain"
+    >
+    
+    <h1 class="text-2xl font-extrabold text-primary">Computer Science Department</h1>
+    <p class="text-lg text-gray-700 mt-1 font-semibold">Attendance Portal</p>
+  </div>
+
+  <p class="text-center text-gray-600 mb-5 text-lg">
+    Welcome! Please register or login as Teacher, Student, or Admin.
+  </p>
+
+
+      <!-- Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Teacher Card -->
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center border border-gray-200 hover:shadow-lg transition card-animate">
+          <div class="bg-blue-100 rounded-full p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 7v-7m0 0l-9-5m9 5l9-5" />
+            </svg>
+          </div>
+          <h2 class="font-bold text-xl mb-3 text-gray-800">Teacher</h2>
+          <div class="flex gap-3">
+            <form action="/signup" method="GET">
+              <button name="userType" value="teacher" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Register</button>
+            </form>
+            <form action="/login" method="GET">
+              <button name="userType" value="teacher" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Login</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Student Card -->
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center border border-gray-200 hover:shadow-lg transition card-animate">
+          <div class="bg-green-100 rounded-full p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.5 0 4.847.655 6.879 1.804M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
+          <h2 class="font-bold text-xl mb-3 text-gray-800">Student</h2>
+          <div class="flex gap-3">
+            <form action="/signup" method="GET">
+              <button name="userType" value="student" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Register</button>
+            </form>
+            <form action="/login" method="GET">
+              <button name="userType" value="student" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Login</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Admin Card -->
+        <div class="bg-white rounded-xl shadow-md p-8 flex flex-col items-center border border-gray-200 hover:shadow-lg transition card-animate">
+          <div class="bg-yellow-100 rounded-full p-4 mb-4">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 21m6-4l.75 4M4 4h16v2a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm0 0V2a2 2 0 012-2h12a2 2 0 012 2v2" />
+            </svg>
+          </div>
+          <h2 class="font-bold text-xl mb-3 text-gray-800">Admin</h2>
+          <form action="/login" method="GET">
+            <button name="userType" value="admin" class="bg-gray-100 text-black px-5 py-2 rounded-lg font-medium shadow hover:bg-white border transition">Login</button>
+          </form>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</body>
+</html>

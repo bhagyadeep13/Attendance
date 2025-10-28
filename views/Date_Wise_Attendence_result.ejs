@@ -1,0 +1,195 @@
+<%- include('partials/head') %>
+</head>
+<body class="bg-gray-100 min-h-screen ">
+  <%- include('partials/nav') %>
+  <div class="flex items-center justify-center mt-10">
+  <div class="bg-white shadow-xl rounded-2xl p-6 w-full max-w-4xl">
+    <h1 class="text-2xl font-bold text-center mb-4">Attendance Report</h1>
+
+    <!-- Class Info -->
+    <p class="text-gray-700 mb-4 text-center">
+      <strong><%= branchName %> - Year <%= year %>, Sem <%= semester %>, Section <%= sectionName %></strong><br>
+      Subject: <strong><%= subject %></strong> | Date: <%= date %>
+    </p>
+
+    <!-- Summary -->
+    <div id="summaryBox" class="flex justify-between bg-gray-50 p-3 rounded-xl mb-4">
+      <span>Total Students: <strong id="totalStudents"><%= totalStudents %></strong></span>
+      <span class="text-green-600">Present: <strong id="presentCount"><%= presentCount %></strong></span>
+      <span class="text-red-600">Absent: <strong id="absentCount"><%= absentCount %></strong></span>
+    </div>
+
+    <!-- Attendance Table -->
+    <table class="w-full border-collapse border border-gray-300">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="border p-2 text-left">Enrollment No</th>
+          <th class="border p-2 text-center">Status</th>
+          <th class="border p-2 text-center">Action</th>
+        </tr>
+      </thead>
+      <tbody id="attendanceTable">
+        <% report.forEach(student => { %>
+          <tr data-enrollment="<%= student.enrollmentNo %>"
+              class="<%= student.status === 'Present' ? 'bg-green-50' : student.status === 'Absent' ? 'bg-red-50' : '' %>">
+            <td class="border p-2"><%= student.enrollmentNo %></td>
+            <td class="border p-2 text-center font-bold status-cell">
+              <span class="<%= student.status === 'Present' ? 'text-green-600' : student.status === 'Absent' ? 'text-red-600' : 'text-gray-500' %>">
+                <%= student.status %>
+              </span>
+            </td>
+            <td class="border p-2 text-center">
+              <button 
+                class="bg-blue-300 text-black px-3 py-1 rounded-lg hover:bg-blue-500 edit-btn"
+                data-enrollment="<%= student.enrollmentNo %>"
+                data-status="<%= student.status %>">
+                Edit
+              </button>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <!-- Back Link -->
+    <div class="mt-6 text-center">
+      <form action="/report" method="GET">
+        <button type="submit" class="bg-red-500 text-white px-3 py-1 rounded-xl hover:bg-red-700">Back</button>
+      </form>
+    </div>
+    
+  </div>
+
+
+  <!-- Edit Modal -->
+  <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-xl shadow-lg w-full max-w-sm">
+      <h2 class="text-xl font-bold mb-4 text-center">Edit Attendance</h2>
+      <form id="editForm">
+        <!-- Enrollment Display -->
+        <p id="modalEnrollmentDisplay" class="text-center mb-3 text-gray-700 font-semibold"></p>
+        <input type="hidden" name="enrollmentNo" id="modalEnrollmentNo">
+
+        <div class="mb-4">
+          <label class="block text-sm mb-2">Status</label>
+          <select name="status" id="modalStatus" class="w-full border rounded-xl p-2">
+            <option value="Present">Present</option>
+            <option value="Absent">Absent</option>
+          </select>
+        </div>
+
+        <div class="flex justify-between">
+          <button type="button" id="cancelBtn" class="bg-gray-300 px-3 py-1 rounded-xl">Cancel</button>
+          <button type="submit" class="bg-blue-600 text-white px-3 py-1 rounded-xl hover:bg-blue-700">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JS for Modal + API Call -->
+  <script>
+    const editModal = document.getElementById('editModal');
+    const modalEnrollmentNo = document.getElementById('modalEnrollmentNo');
+    const modalEnrollmentDisplay = document.getElementById('modalEnrollmentDisplay');
+    const modalStatus = document.getElementById('modalStatus');
+    const editForm = document.getElementById('editForm');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    let currentRow = null;
+
+    // Show modal when edit button is clicked
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        modalEnrollmentNo.value = btn.dataset.enrollment;
+        modalEnrollmentDisplay.textContent = `Enrollment No: ${btn.dataset.enrollment}`;
+        modalStatus.value = btn.dataset.status;
+        currentRow = btn.closest("tr");
+        editModal.classList.remove('hidden');
+      });
+    });
+
+    // Close modal
+    cancelBtn.addEventListener('click', () => {
+      editModal.classList.add('hidden');
+      currentRow = null;
+    });
+
+    // Handle form submit (PUT request)
+  editForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+
+  try {
+    const res = await fetch('/edit', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        branchName: "<%= branchName %>",
+        year: "<%= year %>",
+        semester: "<%= semester %>",
+        sectionName: "<%= sectionName %>",
+        date: "<%= date %>",
+        subject: "<%= subject %>",
+        enrollmentNo: modalEnrollmentNo.value,
+        status: modalStatus.value
+      })
+    });
+    
+    if (res.ok) {
+      const data = await res.json();
+      // print data
+      console.log("✅ Attendance updated:", data);
+      const newStatus = modalStatus.value;
+      const statusCell = currentRow.querySelector('.status-cell');
+      const presentCount = document.getElementById('presentCount');
+      const absentCount = document.getElementById('absentCount');
+
+      const oldStatus = statusCell.innerText.trim();
+      if (oldStatus !== newStatus) {
+        if (oldStatus === 'Present') presentCount.innerText = +presentCount.innerText - 1;
+        if (oldStatus === 'Absent') absentCount.innerText = +absentCount.innerText - 1;
+        if (newStatus === 'Present') presentCount.innerText = +presentCount.innerText + 1;
+        if (newStatus === 'Absent') absentCount.innerText = +absentCount.innerText + 1;
+      }
+
+      // 🔹 Update row styling + text
+      currentRow.classList.remove('bg-green-50', 'bg-red-50');
+      statusCell.innerHTML = `<span class="${newStatus === 'Present' ? 'text-green-600' : 'text-red-600'}">${newStatus}</span>`;
+      currentRow.classList.add(newStatus === 'Present' ? 'bg-green-50' : 'bg-red-50');
+
+      // 🔹 Update overall attendance (from server response)
+      if (data.updatedData && data.updatedData.overall) {
+        const { totalClass, totalPresent, totalAbsent, overallPercentage } = data.updatedData.overall;
+
+        // find overall cells in the same row
+        const totalClassCell = currentRow.querySelector('.overall-total');
+        const presentCell = currentRow.querySelector('.overall-present');
+        const absentCell = currentRow.querySelector('.overall-absent');
+        const percentCell = currentRow.querySelector('.overall-percent');
+
+        if (totalClassCell && presentCell && absentCell && percentCell) {
+          totalClassCell.innerText = totalClass;
+          presentCell.innerText = totalPresent;
+          absentCell.innerText = totalAbsent;
+          percentCell.innerText = `${overallPercentage}%`;
+
+          // Optional: color code the percentage
+          percentCell.classList.remove('text-green-600', 'text-red-600');
+          percentCell.classList.add(overallPercentage >= 75 ? 'text-green-600' : 'text-red-600');
+        }
+      }
+
+      // Close modal
+      editModal.classList.add('hidden');
+      currentRow = null;
+    } else {
+      const errorData = await res.json();
+      alert(errorData.error || 'Failed to update attendance');
+    }
+  } catch (err) {
+    console.error('❌ Error updating attendance:', err);
+    alert('Something went wrong while updating attendance');
+  }
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Overall Attendance</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 font-sans text-gray-900">
+  <!-- Include Navbar -->
+  <%- include("partials/header", { currentPage: "OverallAttendance", IsLoggedIn, user }) %>
+
+  <main class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">
+      Overall Attendance Ratio - <%= classInfo.className %> (<%= classInfo.year %>, Section <%= classInfo.section %>)
+    </h1>
+
+    <% if (error) { %>
+      <p class="text-center text-red-500 font-semibold"><%= error %></p>
+    <% } else if (students.length === 0) { %>
+      <p class="text-center text-gray-600">No student records found for this class.</p>
+    <% } else { %>
+      <div class="overflow-x-auto shadow-lg rounded-lg">
+        <table class="w-full table-auto border-collapse">
+          <thead class="bg-gray-800 text-white">
+            <tr>
+              <th class="px-4 py-2 text-left">Enrollment No</th>
+              <th class="px-4 py-2 text-left">Total Classes</th>
+              <th class="px-4 py-2 text-left">Present</th>
+              <th class="px-4 py-2 text-left">Absent</th>
+              <th class="px-4 py-2 text-left">Attendance %</th>
+              <th class="px-4 py-2 text-left">Details</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% students.forEach(student => { 
+                let percentage = student.totalClass > 0 
+                  ? ((student.totalPresent / student.totalClass) * 100).toFixed(2) 
+                  : 0;
+            %>
+              <tr>
+                <td class="px-4 py-2 font-medium"><%= student.enrollmentNo %></td>
+                <td class="px-4 py-2"><%= student.totalClass %></td>
+                <td class="px-4 py-2 text-green-600"><%= student.totalPresent %></td>
+                <td class="px-4 py-2 text-red-600"><%= student.totalAbsent %></td>
+                <td class="px-4 py-2 font-semibold"><%= percentage %>%</td>
+                <td class="px-4 py-2">
+                  <a href="/attendance/<%= student.enrollmentNo %>" 
+                     class="text-blue-600 hover:underline">View Report</a>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

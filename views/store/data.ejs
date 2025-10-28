@@ -1,0 +1,257 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans">
+<%- include('../partials/nav') %>
+
+<div class="flex items-center justify-center min-h-screen">
+  <div class="bg-white shadow-xl rounded-2xl border border-gray-200 w-full max-w-5xl mx-4 p-10 flex flex-col md:flex-row gap-10">
+
+    <!-- Left: Form -->
+    <div class="flex-1 flex flex-col justify-center">
+      <h1 class="text-3xl font-extrabold text-purple-700 mb-6 text-center">
+        Upload Students Excel
+      </h1>
+
+      <!-- Select Class -->
+      <div class="mb-6">
+        <p class="font-semibold mb-2 text-gray-700">Select Branch Name:</p>
+        <label class="flex items-center gap-2">
+          <input type="radio" name="className" value="CSE" checked class="accent-blue-600" /> CSE
+        </label>
+      </div>
+
+      <!-- Select Year -->
+      <div class="mb-6">
+        <p class="font-semibold mb-2 text-gray-700">Select Year:</p>
+        <div class="flex flex-col gap-2" id="yearOptions">
+          <label><input type="radio" name="year" value="I" checked class="accent-blue-600" /> I</label>
+          <label><input type="radio" name="year" value="II" class="accent-blue-600" /> II</label>
+          <label><input type="radio" name="year" value="III" class="accent-blue-600" /> III</label>
+          <label><input type="radio" name="year" value="IV" class="accent-blue-600" /> IV</label>
+        </div>
+      </div>
+
+      <!-- Semester (Dynamic) -->
+      <div class="mb-6 hidden" id="semesterContainer">
+        <p class="font-semibold mb-2 text-gray-700">Select Semester:</p>
+        <div class="flex flex-col gap-2" id="semesterOptions"></div>
+      </div>
+
+      <!-- Select Section -->
+      <div class="mb-6">
+        <p class="font-semibold mb-2 text-gray-700">Select Section Name:</p>
+        <div class="flex flex-col gap-2" id="sectionOptions">
+          <label><input type="radio" name="sectionName" value="A" checked class="accent-blue-600" /> A</label>
+          <label><input type="radio" name="sectionName" value="B" class="accent-blue-600" /> B</label>
+        </div>
+      </div>
+
+      <!-- File input -->
+      <div class="mb-6">
+        <label for="file" class="block font-semibold mb-2 text-gray-700">
+          Upload Excel File:
+        </label>
+        <input
+          type="file"
+          id="file"
+          accept=".xlsx,.xls"
+          class="w-full px-4 py-3 border border-blue-300 rounded-lg shadow-sm bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+        />
+        <div class="mt-1">
+          <label for="link">Format :</label>
+        <a href="https://docs.google.com/spreadsheets/d/1AQI7pPOqa1zS63r8alO3Vmk_MzZvUZT8/edit?usp=drive_link&ouid=104402758273433314503&rtpof=true&sd=true" id = "link" class="text-blue-500 underline">View Sample Excel</a>
+        </div>
+      </div>
+
+      <!-- Bifurcation Controls -->
+      <div id="bifurcationControls" class="hidden mb-6">
+        <h3 class="font-bold text-gray-800 mb-2">Create Batches by Enrollment Range</h3>
+
+        <input id="batchNameInput" type="text" placeholder="Enter Batch Name (e.g. A1, B2, Custom)" 
+               class="border px-2 py-1 rounded w-full mb-2" />
+
+        <input id="rangeStart" type="text" placeholder="Start Enrollment" class="border px-2 py-1 rounded w-full mb-2" />
+        <input id="rangeEnd" type="text" placeholder="End Enrollment" class="border px-2 py-1 rounded w-full mb-2" />
+
+        <button id="addBatchBtn" class="w-full bg-purple-600 text-white py-2 rounded-lg mb-2">
+          Add Batch
+        </button>
+        <button id="finishBatchesBtn" class="w-full bg-green-600 text-white py-2 rounded-lg">
+          Finish & Upload
+        </button>
+      </div>
+    </div>
+
+    <!-- Right: Parsed Students -->
+    <div class="flex-1 bg-white rounded-2xl shadow-inner border border-gray-200 p-6 overflow-auto max-h-[32rem]">
+      <h2 class="text-xl font-bold text-gray-800 mb-4 text-center">
+        Students List
+      </h2>
+      <div id="result" class="text-left text-sm max-h-[24rem] overflow-auto"></div>
+      <div id="batchResult" class="text-left text-sm mt-2"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+let studentsData = [];
+let batches = [];
+let batchCounter = 1;
+
+// --- Semester Options ---
+const yearRadios = document.querySelectorAll('input[name="year"]');
+const semesterContainer = document.getElementById('semesterContainer');
+const semesterOptions = document.getElementById('semesterOptions');
+
+function updateSemesterOptions(selectedYear) {
+  let semesters = [];
+  switch (selectedYear) {
+    case 'I': semesters = [1, 2]; break;
+    case 'II': semesters = [3, 4]; break;
+    case 'III': semesters = [5, 6]; break;
+    case 'IV': semesters = [7, 8]; break;
+  }
+  semesterOptions.innerHTML = semesters.map((s, idx) => `
+    <label><input type="radio" name="semester" value="${s}" class="accent-blue-600" ${idx===0?'checked':''}/> Semester ${s}</label>
+  `).join('');
+  semesterContainer.classList.remove('hidden');
+}
+yearRadios.forEach(r => r.addEventListener('change', e => updateSemesterOptions(e.target.value)));
+updateSemesterOptions(document.querySelector('input[name="year"]:checked').value);
+
+// --- Excel Upload ---
+document.getElementById('file').addEventListener('change', e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = evt => {
+    const workbook = XLSX.read(new Uint8Array(evt.target.result), { type: 'array' });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const json = XLSX.utils.sheet_to_json(sheet);
+
+    studentsData = json.map(row => {
+      const keys = Object.keys(row);
+      const nameKey = keys.find(k => k.toLowerCase().includes('name'));
+      const enrollKey = keys.find(k => k.toLowerCase().includes('enroll'));
+      return { name: row[nameKey] || '', enrollmentNo: row[enrollKey] || '' };
+    });
+
+    // Sort lexicographically by enrollmentNo
+    studentsData.sort((a, b) => a.enrollmentNo.localeCompare(b.enrollmentNo));
+
+    // Display students with serial numbers
+    document.getElementById('result').innerHTML = studentsData.length ? `
+      <div class="grid grid-cols-1 gap-2">
+        ${studentsData.map((s, idx) => `
+          <div class="p-2 border rounded-lg shadow-sm bg-white flex justify-between items-center hover:bg-blue-50 transition">
+            <span class="font-semibold text-blue-700">${idx + 1}.</span>
+            <span class="text-gray-700 flex-1 ml-2">${s.name}</span>
+            <span class="text-gray-500">${s.enrollmentNo}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : `<div class="text-gray-400 italic text-center py-4">No students found in file.</div>`;
+
+    if(studentsData.length>0) {
+      document.getElementById('bifurcationControls').classList.remove('hidden');
+      document.getElementById('rangeStart').value = studentsData[0].enrollmentNo;
+      document.getElementById('rangeEnd').value = '';
+    }
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// --- Render batches with serial numbers ---
+function renderBatches() {
+  document.getElementById('batchResult').innerHTML = batches.map(b => `
+    <div class="p-3 border rounded-lg mb-3 shadow-sm bg-gray-50">
+      <div class="flex justify-between items-center">
+        <span class="font-semibold text-purple-700">${b.batchName}</span>
+        <span class="text-sm text-gray-600">${b.students.length} students</span>
+      </div>
+      <ul class="list-disc pl-6 mt-2 text-gray-700 text-sm max-h-32 overflow-y-auto">
+        ${b.students.map((s, idx) => `<li>${idx + 1}. ${s.name} - ${s.enrollmentNo}</li>`).join('')}
+      </ul>
+    </div>
+  `).join('');
+}
+
+// --- Add Batch ---
+document.getElementById('addBatchBtn').addEventListener('click', () => {
+  const start = document.getElementById('rangeStart').value.trim().toUpperCase();
+  const end = document.getElementById('rangeEnd').value.trim().toUpperCase();
+  const section = document.querySelector('input[name="sectionName"]:checked').value;
+  let batchName = document.getElementById('batchNameInput').value.trim();
+
+  if(!start){
+    alert('Please enter a valid start enrollment.');
+    return;
+  }
+
+  // If no end specified, take all remaining students
+  const batchStudents = studentsData.filter(s => {
+    const enr = s.enrollmentNo.toUpperCase();
+    if(end) return enr >= start && enr <= end;
+    return enr >= start;
+  });
+
+  if(batchStudents.length===0){
+    alert('No students found in this range.');
+    return;
+  }
+
+  if(!batchName) batchName = section + batchCounter;
+  batchCounter++;
+
+  batches.push({ batchName, students: batchStudents });
+
+  // Render batches
+  renderBatches();
+
+  // Reset inputs for next batch
+  document.getElementById('batchNameInput').value='';
+
+  // Set next batch start to next student after last batch
+  const lastIndex = studentsData.findIndex(s => s.enrollmentNo.toUpperCase() === batchStudents[batchStudents.length-1].enrollmentNo.toUpperCase());
+  const nextStart = studentsData[lastIndex+1]?.enrollmentNo || '';
+  document.getElementById('rangeStart').value = nextStart;
+  document.getElementById('rangeEnd').value = '';
+});
+
+// --- Finish & Upload ---
+document.getElementById('finishBatchesBtn').addEventListener('click', ()=> {
+  const className = document.querySelector('input[name="className"]:checked').value;
+  const sectionName = document.querySelector('input[name="sectionName"]:checked').value;
+  const year = document.querySelector('input[name="year"]:checked').value;
+  const semester = document.querySelector('input[name="semester"]:checked')?.value;
+
+  const payload = { className, sectionName, year, semester, batches, students: studentsData };
+
+  fetch('/upload', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    alert(data.message || 'Students saved successfully!');
+
+    // Reset everything
+    studentsData = [];
+    batches = [];
+    batchCounter = 1;
+    document.getElementById('file').value = '';
+    document.getElementById('result').innerHTML = '';
+    document.getElementById('batchResult').innerHTML = '';
+    document.getElementById('bifurcationControls').classList.add('hidden');
+  })
+  .catch(err=>{
+    console.error(err);
+    alert('Failed to save students.');
+  });
+});
+</script>
+</body>
+</html>

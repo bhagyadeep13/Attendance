@@ -1,0 +1,501 @@
+<%- include('../partials/head') %>
+</head>
+
+<body class="bg-gray-50 min-h-screen font-sans">
+    <%- include('../partials/nav') %>
+    <%- include('../partials/toast') %>
+    <%- include('../partials/animation') %>
+
+    <div class="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl border border-gray-200 p-8 mt-10">
+        <h1 class="text-3xl font-extrabold mb-6 text-center text-purple-700">
+            Mark Attendance
+        </h1>
+
+        <form id="filterForm" class="flex flex-col gap-6 mb-6">
+            <div>
+                <p class="font-semibold mb-2 text-gray-700">Select Branch Name:</p>
+                <label class="flex items-center gap-2 mb-2">
+                    <input type="radio" name="className" value="CSE" <%= selectedClass === 'CSE' ? 'checked' : '' %> class="accent-purple-600" />
+                    CSE
+                </label>
+            </div>
+
+            <div class="flex-1">
+                <p class="font-semibold mb-2 text-gray-700">Select Year:</p>
+                <div class="flex gap-6" id="yearOptions">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="year" value="I" <%= selectedYear === 'I' ? 'checked' : '' %> class="accent-indigo-600" /> I
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="year" value="II" <%= selectedYear === 'II' ? 'checked' : '' %> class="accent-indigo-600" /> II
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="year" value="III" <%= selectedYear === 'III' ? 'checked' : '' %> class="accent-indigo-600" /> III
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="year" value="IV" <%= selectedYear === 'IV' ? 'checked' : '' %> class="accent-indigo-600" /> IV
+                    </label>
+                </div>
+            </div>
+
+            <div class="flex-1 hidden" id="semesterContainer">
+                <p class="font-semibold mb-2 text-gray-700">Select Semester:</p>
+                <div class="flex flex-wrap gap-6" id="semesterOptions"></div>
+            </div>
+
+            <div class="flex-1 hidden" id="sectionContainer">
+                <p class="font-semibold mb-2 text-gray-700">Select Section:</p>
+                <div class="flex flex-wrap gap-6" id="sectionOptions"></div>
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1">Subject</label>
+                <select id="subjectSelect" name="subject" required
+                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 mb-4">
+                    <option value="" disabled selected>Select subject</option>
+                </select>
+            </div>
+
+            <div id="batchContainer" class="hidden">
+                <label class="block font-semibold mb-1">Select Batch</label>
+                <select id="batchSelect" name="batch"
+                        class="w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400 mb-4">
+                    <option value="" disabled selected>Select batch</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block font-semibold mb-1">Date</label>
+                <input type="date" name="date" value="<%= new Date().toISOString().split('T')[0] %>" readonly
+                       class="w-full p-2 border border-gray-300 rounded-lg bg-gray-100 cursor-not-allowed mb-4">
+            </div>
+
+            <button type="button" id="viewStudentsBtn" class="w-full bg-blue-500 text-white py-3 rounded-xl font-bold shadow hover:bg-white hover:text-blue-500 border transition-all duration-200">
+                View Students
+            </button>
+        </form>
+
+        <div id="attendanceContainer" style="<%= (students && students.length > 0) ? '' : 'display: none;' %>">
+            <div class="overflow-x-auto rounded-xl shadow-lg border border-gray-200">
+                <table class="min-w-full table-auto border-collapse">
+                    <thead class="bg-gradient-to-r from-purple-500 to-pink-500 text-white text-lg font-bold">
+                        <tr>
+                            <th class="px-4 py-2">S.No</th>
+                            <th class="px-4 py-2">Name</th>
+                            <th class="px-4 py-2">Enrollment No</th>
+                            <th class="px-4 py-2">Attendance</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <% if (students && students.length > 0) { %>
+                            <% students.forEach((student, index) => { %>
+                                <tr class="hover:bg-purple-50 transition-all">
+                                    <td class="border px-4 py-2 text-center"><%= index + 1 %></td>
+                                    <td class="border px-4 py-2"><%= student.name %></td>
+                                    <td class="border px-4 py-2"><%= student.enrollmentNo %></td>
+                                    <td class="border px-4 py-2 text-center flex flex-col gap-2">
+                                        <label class="inline-flex items-center gap-1">
+                                            <input type="radio" name="attendance[<%= student.enrollmentNo %>]" value="Present" required class="accent-green-600" /> Present
+                                        </label>
+                                        <label class="inline-flex items-center gap-1">
+                                            <input type="radio" name="attendance[<%= student.enrollmentNo %>]" value="Absent" required class="accent-red-600" /> Absent
+                                        </label>
+                                    </td>
+                                </tr>
+                            <% }) %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="flex flex-col gap-3 mt-4">
+                <button type="button" id="submitAttendanceBtn" class="bg-blue-500 text-white py-3 rounded-xl font-bold shadow hover:bg-white hover:text-blue-500 border transition-all duration-200">
+                    Submit Attendance
+                </button>
+                <button type="button" onclick="selectAllPresent()" class="bg-blue-500 text-white px-6 py-2 rounded-xl shadow hover:bg-white hover:text-blue-500 border transition-all duration-200">
+                    Select All Present
+                </button>
+                <button type="button" onclick="selectAllAbsent()" class="bg-blue-500 text-white px-6 py-2 rounded-xl shadow hover:bg-white hover:text-blue-500 border transition-all duration-200">
+                    Select All Absent
+                </button>
+            </div>
+        </div>
+        
+        <p id="noStudentsMessage" class="text-center text-gray-500 mt-6" style="<%= (students && students.length > 0) ? 'display: none;' : '' %>">
+            No students found.
+        </p>
+
+    </div>
+
+    <script>
+        // DOM element references
+        const branchRadios = document.querySelectorAll('input[name="className"]');
+        const yearRadios = document.querySelectorAll('input[name="year"]');
+        const semesterContainer = document.getElementById('semesterContainer');
+        const semesterOptions = document.getElementById('semesterOptions');
+        const sectionContainer = document.getElementById('sectionContainer');
+        const sectionOptionsWrapper = document.getElementById('sectionOptions');
+
+        const filterForm = document.getElementById('filterForm');
+        const subjectSelect = document.getElementById('subjectSelect');
+        const batchContainer = document.getElementById('batchContainer');
+        const batchSelect = document.getElementById('batchSelect');
+        const viewStudentsBtn = document.getElementById('viewStudentsBtn');
+        const submitAttendanceBtn = document.getElementById('submitAttendanceBtn');
+
+        const studentsTableBody = document.getElementById('studentsTableBody');
+        const attendanceContainer = document.getElementById('attendanceContainer');
+        const noStudentsMessage = document.getElementById('noStudentsMessage');
+
+        let allLabBatches = [];
+
+        // --- Core Functions ---
+
+        async function fetchSemestersAndSections() {
+            const branch = document.querySelector('input[name="className"]:checked')?.value;
+            const year = document.querySelector('input[name="year"]:checked')?.value;
+            if (!branch || !year) return;
+            try {
+                const res = await fetch(`/get-sem-sections?branchName=${branch}&year=${year}`);
+                const data = await res.json();
+                
+                semesterOptions.innerHTML = "";
+                data.forEach((item, idx) => {
+                    semesterOptions.innerHTML += `
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="semester" value="${item.semester}" class="accent-purple-600" ${idx === 0 ? 'checked' : ''} />
+                            Semester ${item.semester}
+                        </label>`;
+                });
+                semesterContainer.classList.remove('hidden');
+                populateSections(data[0]?.sections || []);
+                document.querySelectorAll('input[name="semester"]').forEach(radio => {
+                    radio.addEventListener('change', e => {
+                        const selectedSem = e.target.value;
+                        const selectedData = data.find(d => d.semester === selectedSem);
+                        populateSections(selectedData?.sections || []);
+                    });
+                });
+            } catch (err) {
+                console.error("Error fetching semesters & sections:", err);
+            }
+        }
+
+        function populateSections(sections) {
+            sectionOptionsWrapper.innerHTML = "";
+            if (sections.length > 0) {
+                sectionContainer.classList.remove('hidden');
+                sections.forEach(sec => {
+                    sectionOptionsWrapper.innerHTML += `
+                        <label class="flex items-center gap-2">
+                            <input type="radio" name="sectionName" value="${sec}" class="accent-pink-500" />
+                            ${sec}
+                        </label>`;
+                });
+            } else {
+                sectionContainer.classList.add('hidden');
+            }
+        }
+
+        async function fetchSubjects(branch, year, semester, sectionName) {
+            if (!branch || !year || !semester || !sectionName) return;
+            try {
+                const res = await fetch('/subject/get-subjects', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ branchName: branch, year, semester, sectionName })
+                });
+                const subjects = await res.json();
+                subjectSelect.innerHTML = `<option value="" disabled selected>Select subject</option>`;
+                subjects.forEach(sub => {
+                    subjectSelect.innerHTML += `<option value="${sub.subjectName}">${sub.subjectCode} - ${sub.subjectName}</option>`;
+                });
+            } catch (err) {
+                console.error("Error fetching subjects:", err);
+                subjectSelect.innerHTML = `<option value="" disabled selected>Error loading subjects</option>`;
+            }
+        }
+        
+        function renderStudents(students) {
+            studentsTableBody.innerHTML = '';
+            if (students && students.length > 0) {
+                students.forEach((student, index) => {
+                    studentsTableBody.innerHTML += `
+                        <tr class="hover:bg-purple-50 transition-all">
+                            <td class="border px-4 py-2 text-center">${index + 1}</td>
+                            <td class="border px-4 py-2">${student.name}</td>
+                            <td class="border px-4 py-2">${student.enrollmentNo}</td>
+                            <td class="border px-4 py-2 text-center flex flex-col gap-2">
+                                <label class="inline-flex items-center gap-1">
+                                    <input type="radio" name="attendance[${student.enrollmentNo}]" value="Present" required class="accent-green-600" /> Present
+                                </label>
+                                <label class="inline-flex items-center gap-1">
+                                    <input type="radio" name="attendance[${student.enrollmentNo}]" value="Absent" required class="accent-red-600" /> Absent
+                                </label>
+                            </td>
+                        </tr>
+                    `;
+                });
+                attendanceContainer.style.display = 'block';
+                noStudentsMessage.style.display = 'none';
+            } else {
+                studentsTableBody.innerHTML = '<tr><td colspan="4" class="text-center text-gray-500 py-4">No students found for this class.</td></tr>';
+                attendanceContainer.style.display = 'block';
+                noStudentsMessage.style.display = 'none';
+            }
+        }
+        
+        // --- Event Listeners ---
+        
+        branchRadios.forEach(r => r.addEventListener('change', fetchSemestersAndSections));
+        yearRadios.forEach(r => r.addEventListener('change', fetchSemestersAndSections));
+
+        window.addEventListener('DOMContentLoaded', () => {
+            fetchSemestersAndSections();
+        });
+
+        sectionOptionsWrapper.addEventListener('change', () => {
+            const branch = document.querySelector('input[name="className"]:checked')?.value;
+            const year = document.querySelector('input[name="year"]:checked')?.value;
+            const semester = document.querySelector('input[name="semester"]:checked')?.value;
+            const sectionName = document.querySelector('input[name="sectionName"]:checked')?.value;
+            fetchSubjects(branch, year, semester, sectionName);
+        });
+        
+        // Handle subject selection logic (show/hide batch, fetch lab data)
+        subjectSelect.addEventListener('change', async (e) => {
+            const selectedSubject = e.target.value;
+            const isLabSubject = selectedSubject.toLowerCase().includes('lab');
+
+            // Reset display
+            noStudentsMessage.style.display = 'block';
+            attendanceContainer.style.display = 'none';
+            studentsTableBody.innerHTML = '';
+            
+            const branch = document.querySelector('input[name="className"]:checked')?.value;
+            const year = document.querySelector('input[name="year"]:checked')?.value;
+            const semester = document.querySelector('input[name="semester"]:checked')?.value;
+            const sectionName = document.querySelector('input[name="sectionName"]:checked')?.value;
+            
+            if (!branch || !year || !semester || !sectionName) {
+                noStudentsMessage.textContent = 'Please complete all selections to view students.';
+                return;
+            }
+
+            if (isLabSubject) {
+                // LAB SUBJECT LOGIC
+                batchContainer.classList.remove('hidden');
+                viewStudentsBtn.style.display = 'none';
+                noStudentsMessage.textContent = 'Please select a batch to view students.';
+
+                try {
+                    const res = await fetch(`/lab-students?className=${branch}&year=${year}&semester=${semester}&sectionName=${sectionName}`);
+                    const data = await res.json();
+                    
+                    allLabBatches = data.batches;
+                    console.log('dadak',allLabBatches);
+                    
+                    batchSelect.innerHTML = `<option value="" disabled selected>Select batch</option>`;
+                    allLabBatches.forEach(batch => {
+                        batchSelect.innerHTML += `<option value="${batch.batchName}">${batch.batchName}</option>`;
+                    });
+
+                } catch (err) {
+                    console.error("Error fetching lab data:", err);
+                    batchSelect.innerHTML = `<option value="" disabled selected>Error loading batches</option>`;
+                }
+            } else {
+                // THEORY SUBJECT LOGIC
+                batchContainer.classList.add('hidden');
+                viewStudentsBtn.style.display = 'block';
+                noStudentsMessage.textContent = 'Click "View Students" to load the list.';
+            }
+        });
+
+        submitAttendanceBtn.addEventListener('click', async (e) => {
+    e.preventDefault();
+
+    // 1. Show loading state at the start
+    document.getElementById('loading-animation').classList.remove('hidden');
+    submitAttendanceBtn.disabled = true;
+    submitAttendanceBtn.textContent = 'Submitting...';
+
+    const isLabSubject = subjectSelect.value.toLowerCase().includes('lab');
+    const attendanceData = {
+        className: document.querySelector('input[name="className"]:checked')?.value,
+        year: document.querySelector('input[name="year"]:checked')?.value,
+        semester: document.querySelector('input[name="semester"]:checked')?.value,
+        sectionName: document.querySelector('input[name="sectionName"]:checked')?.value,
+        subject: subjectSelect.value,
+        date: document.querySelector('input[name="date"]')?.value,
+        attendance: {}
+    };
+
+    if (isLabSubject) {
+        attendanceData.batch = batchSelect.value;
+    }
+
+    const attendanceRadios = document.querySelectorAll('#studentsTableBody input[type="radio"]:checked');
+    attendanceRadios.forEach(radio => {
+        const enrollmentNo = radio.name.match(/\[(.*?)\]/)[1];
+        attendanceData.attendance[enrollmentNo] = radio.value;
+    });
+
+    try {
+        const res = await fetch('/submit-attendance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(attendanceData)
+        });
+
+        if (res.ok) {
+            // 2. Success: Show toast and reset form
+            showToast('Attendance submitted successfully!', 'success');
+            resetFormAndUI();
+        } else {
+            // 3. Error: Handle message from server
+            const result = await res.json();
+            showToast('Error: ' + result.message, 'error');
+        }
+    } catch (error) {
+        // 4. Network/other error
+        console.error('Submission failed:', error);
+        showToast('An unexpected error occurred during submission.', 'error');
+    } finally {
+        // 5. Always hide loading state and re-enable button
+        document.getElementById('loading-animation').classList.add('hidden');
+        submitAttendanceBtn.disabled = false;
+        submitAttendanceBtn.textContent = 'Submit Attendance';
+    }
+});
+
+function resetFormAndUI() {
+    // Uncheck all radio buttons for class, year, etc.
+    document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+
+    // Reset select dropdowns
+    subjectSelect.selectedIndex = 0;
+    batchSelect.selectedIndex = 0;
+
+    // Hide conditional containers
+    semesterContainer.classList.add('hidden');
+    sectionContainer.classList.add('hidden');
+    batchContainer.classList.add('hidden');
+
+    // Hide the students table
+    attendanceContainer.style.display = 'none';
+    studentsTableBody.innerHTML = '';
+    noStudentsMessage.style.display = 'block';
+    noStudentsMessage.textContent = 'No students found.';
+
+    // Reset the "View Students" button state
+    viewStudentsBtn.style.display = 'block';
+}
+        // Event listener for the "View Students" button (for theory classes)
+        viewStudentsBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const branch = document.querySelector('input[name="className"]:checked')?.value;
+            const year = document.querySelector('input[name="year"]:checked')?.value;
+            const semester = document.querySelector('input[name="semester"]:checked')?.value;
+            const sectionName = document.querySelector('input[name="sectionName"]:checked')?.value;
+
+            if (!branch || !year || !semester || !sectionName) {
+                alert('Please select Branch, Year, Semester, and Section.');
+                return;
+            }
+            
+            // Collect all data from the filter form
+            const filterData = {
+                className: branch,
+                year: year,
+                semester: semester,
+                sectionName: sectionName,
+                subject: subjectSelect.value,
+                date: document.querySelector('input[name="date"]')?.value
+            };
+
+            try {
+                const res = await fetch(`/showList`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(filterData)
+                });
+                const data = await res.json();
+                console.log('sjdsdjds',data);
+                
+                // Render students from the response
+                renderStudents(data.students);
+            } catch (err) {
+                console.error("Error fetching theory students:", err);
+                alert("Failed to load students for this class.");
+            }
+        });
+
+
+        // Listen for batch selection changes (for lab classes only)
+        batchSelect.addEventListener('change', (e) => {
+            const selectedBatchName = e.target.value;
+            const selectedBatch = allLabBatches.find(b => b.batchName === selectedBatchName);
+            
+            renderStudents(selectedBatch.students);
+        });
+
+        // Handle attendance submission for both lab and theory classes
+        submitAttendanceBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+
+            const isLabSubject = subjectSelect.value.toLowerCase().includes('lab');
+
+            // Collect common data
+            const attendanceData = {
+                className: document.querySelector('input[name="className"]:checked')?.value,
+                year: document.querySelector('input[name="year"]:checked')?.value,
+                semester: document.querySelector('input[name="semester"]:checked')?.value,
+                sectionName: document.querySelector('input[name="sectionName"]:checked')?.value,
+                subject: subjectSelect.value,
+                date: document.querySelector('input[name="date"]')?.value,
+                attendance: {}
+            };
+            
+            if (isLabSubject) {
+                attendanceData.batch = batchSelect.value;
+            }
+
+            const attendanceRadios = document.querySelectorAll('#studentsTableBody input[type="radio"]:checked');
+            attendanceRadios.forEach(radio => {
+                const enrollmentNo = radio.name.match(/\[(.*?)\]/)[1];
+                attendanceData.attendance[enrollmentNo] = radio.value;
+            });
+            
+            try {
+                const res = await fetch('/submit-attendance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(attendanceData)
+                });
+                
+                const result = await res.json();
+
+                if (res.ok) {
+                    alert('Attendance submitted successfully!');
+                    window.location.reload();
+                } else {
+                    alert('Error submitting attendance: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Submission failed:', error);
+                alert('An unexpected error occurred during submission.');
+            }
+        });
+
+        // Script to set attendance for all students (used in buttons)
+        function selectAllPresent() {
+            document.querySelectorAll('input[type="radio"][value="Present"]').forEach(radio => radio.checked = true);
+        }
+        function selectAllAbsent() {
+            document.querySelectorAll('input[type="radio"][value="Absent"]').forEach(radio => radio.checked = true);
+        }
+    </script>
+</body>
+</html>

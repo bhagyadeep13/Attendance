@@ -1,0 +1,101 @@
+<%- include('../partials/head') %>
+</head>
+<body class="bg-gray-50 min-h-screen font-sans antialiased">
+  <%- include('../partials/nav') %>
+  <%- include('../partials/animation') %>
+  <%- include('../partials/toast') %>
+
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white shadow-xl rounded-2xl w-full max-w-md p-10 border border-gray-200 flex flex-col gap-6">
+
+      <!-- Title -->
+      <h1 class="text-3xl font-extrabold text-center text-green-700 drop-shadow mb-4">
+        Student Registration
+      </h1>
+      <p class="text-center text-gray-600 mb-6">
+        Fill in the details below to create your student account.
+      </p>
+
+      <!-- Error Message -->
+      <%- include('../partials/error') %>
+
+      <!-- Registration Form -->
+      <form action="/signup" method="POST" class="flex flex-col gap-4">
+        <input type="hidden" name="userType" value="student" />
+
+        <input
+          type="text"
+          name="name"
+          placeholder="Enter Name"
+          value="<%= oldInput.name %>"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+        />
+
+        <input
+          type="email"
+          name="email"
+          placeholder="Email Address"
+          value="<%= oldInput.email %>"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+        />
+
+        <input
+          type="text"
+          name="enrollmentNo"
+          placeholder="Enrollment Number"
+          value="<%= oldInput.enrollmentNumber %>"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+        />
+
+        <input
+          type="password"
+          name="password"
+          placeholder="Password"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+        />
+
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          required
+          class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+        />
+
+        <label class="flex items-center space-x-2">
+          <input
+            type="checkbox"
+            name="terms"
+            class="accent-green-500 scale-110"
+            <%= oldInput.terms ? "checked" : "" %>
+          />
+          <span class="text-gray-700 text-sm">
+            I agree to <a href="#" class="text-green-600 underline hover:text-green-800">terms and conditions</a>
+          </span>
+        </label>
+
+        <button
+          type="submit"
+          class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition"
+        >
+          Sign Up
+        </button>
+      </form>
+
+      <!-- Login Link -->
+      <div class="flex items-center justify-center gap-2">
+        Already have an account? 
+        <form action="/login" class="text-purple-600 font-semibold hover:underline">
+          <input type="text" hidden name="userType" value="student" />
+          <button type="submit">Login</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
