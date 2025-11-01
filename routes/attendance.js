@@ -215,10 +215,7 @@ const XLSX = require("xlsx");
 
 router.get("/attendance/:branch/:year/:semester/:section", async (req, res) => {
   try {
-    console.log("📥 Attendance Report Route Reached");
-
     const { branch, year, semester, section } = req.params;
-    console.log(`🔎 Fetching data for: ${branch} - ${year} - ${semester} - ${section}`);
 
     // 🔹 Find the class document
     const classDoc = await StudentAttendance.findOne({
@@ -229,7 +226,6 @@ router.get("/attendance/:branch/:year/:semester/:section", async (req, res) => {
     });
 
     if (!classDoc) {
-      console.log("⚠ No class found for given filters");
       return res.render("showReport", {
         pageTitle: "Attendance Report",
         currentPage: "AttendanceReport",
@@ -276,6 +272,7 @@ router.get("/attendance/:branch/:year/:semester/:section", async (req, res) => {
           ? ((student.totalPresent / student.totalClass) * 100).toFixed(2)
           : "0.00";
 
+          console.log('student', student);
       return {
         enrollmentNo: student.enrollmentNo,
         name: student.name || "N/A",
@@ -289,20 +286,8 @@ router.get("/attendance/:branch/:year/:semester/:section", async (req, res) => {
 
     // Convert Map -> Array
     const subjects = Array.from(allSubjectsSet.values());
-
+    console
     console.log("✅ Attendance data prepared successfully");
-    console.log(subjects);
-    // print array in studentsWithSummary
-    const student = studentsWithSummary.find(
-      s => s.enrollmentNo === "0801CS221002"
-    );
-
-    if (student) {
-      console.log(student.subjectTotals);
-    } else {
-      console.log("Student not found");
-    }
-
     res.render("showReport", {
       pageTitle: "Attendance Report",
       currentPage: "AttendanceReport",

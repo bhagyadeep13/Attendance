@@ -226,11 +226,12 @@ exports.editAttendance = async (req, res) => {
       status
     } = req.body;
 
+    // 🧩 Validate inputs
     if (!branchName || !year || !semester || !sectionName || !date || !subject || !enrollmentNo || !status) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    // 🔎 Find class record first
+    // 1️⃣ Find class record
     const classRecord = await StudentAttendance.findOne({
       branchName,
       year,
@@ -242,15 +243,14 @@ exports.editAttendance = async (req, res) => {
       return res.status(404).json({ error: "Class record not found" });
     }
 
-    // 🔎 Find student inside class
+    // 2️⃣ Find student inside class
     const student = classRecord.students.find(s => s.enrollmentNo === enrollmentNo);
     if (!student) return res.status(404).json({ error: "Student not found" });
 
-    // Normalize date to start of day for comparison
+    // 3️⃣ Normalize date and find attendance entry
     const targetDate = new Date(date);
     targetDate.setHours(0, 0, 0, 0);
 
-    // Find attendance entry for that date
     const attEntry = student.attendance.find(a => {
       const attDate = new Date(a.date);
       attDate.setHours(0, 0, 0, 0);
@@ -259,21 +259,63 @@ exports.editAttendance = async (req, res) => {
 
     if (!attEntry) return res.status(404).json({ error: "Attendance entry for this date not found" });
 
-    // Find subject inside that date entry
+    // 4️⃣ Find subject inside that date entry
     const subEntry = attEntry.subjects.find(s => s.subject === subject);
     if (!subEntry) return res.status(404).json({ error: "Subject not found for this date" });
 
-    // ✅ Update status
-    subEntry.status = status;
+    const oldStatus = subEntry.status;
 
-    // Save the entire document
+    // 5️⃣ If status changed → update totals
+    if (oldStatus !== status) {
+      subEntry.status = status; // update status
+
+      // 🔹 Update overall totals
+      if (oldStatus === "Present") student.totalPresent--;
+      if (oldStatus === "Absent") student.totalAbsent--;
+
+      if (status === "Present") student.totalPresent++;
+      if (status === "Absent") student.totalAbsent++;
+
+      // 🔹 Update subjectTotals for that subject
+      const subjectTotal = student.subjectTotals.find(sub => sub.subject === subject);
+      if (subjectTotal) {
+        if (oldStatus === "Present") subjectTotal.totalPresent--;
+        if (oldStatus === "Absent") subjectTotal.totalAbsent--;
+
+        if (status === "Present") subjectTotal.totalPresent++;
+        if (status === "Absent") subjectTotal.totalAbsent++;
+      }
+    }
+
+    // 6️⃣ Save updated class record
     await classRecord.save();
 
-    res.json({ message: "Attendance updated successfully", updatedRecord: classRecord });
+    // 7️⃣ Compute updated percentage
+    const overallPercentage =
+      student.totalClass > 0
+        ? ((student.totalPresent / student.totalClass) * 100).toFixed(2)
+        : 0;
+
+    // 8️⃣ Prepare response
+    const updatedSubjectTotal = student.subjectTotals.find(sub => sub.subject === subject);
+
+    res.json({
+      message: "Attendance updated successfully",
+      updatedData: {
+        overall: {
+          totalClass: student.totalClass,
+          totalPresent: student.totalPresent,
+          totalAbsent: student.totalAbsent,
+          overallPercentage
+        },
+        subjectTotal: updatedSubjectTotal
+      }
+    });
   } catch (error) {
     console.error("❌ Error updating attendance:", error);
     res.status(500).json({ error: "Failed to update attendance" });
   }
 };
+
 
 

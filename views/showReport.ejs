@@ -1,155 +1,328 @@
 <%- include('partials/head') %>
-</head>
-<body class="bg-gray-100 min-h-screen">
+  </head>
 
-  <%- include('partials/nav') %>
-  <!-- 🔹 Title -->
-  <div class="text-center mt-6">
-    <h2 class="text-3xl font-bold text-indigo-800">Attendance Report</h2>
-    <p class="text-gray-600 mt-1">
-      Section <b><%= sectionName %></b> | Year <b><%= year %></b>
-    </p>
-  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
-  <!-- 🔹 Filter Section -->
-  <div class="max-w-7xl mx-auto bg-white p-4 mt-4 rounded-lg shadow">
-    <h3 class="text-lg font-semibold mb-2">🔍 Filter Students</h3>
-    <div class="flex flex-wrap gap-4 items-end">
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Subject</label>
-        <select id="subject" class="border rounded px-3 py-2">
-          <option value="Overall">Overall</option>
-          <% if (subjects && subjects.length > 0) { %>
-            <% subjects.forEach(sub => { %>
-              <option value="<%= sub.subject %>"><%= sub.subjectCode %> - <%= sub.subjectName %></option>
-            <% }) %>
-          <% } %>
-        </select>
+  <body class="bg-gray-100 min-h-screen">
+
+    <%- include('partials/nav') %>
+
+      <!-- 🔹 Attendance Report Header -->
+      <div class="text-center mt-6">
+        <h2 class="text-3xl font-bold text-indigo-800">Attendance Report</h2>
+        <p class="text-gray-600 mt-1">
+          Section <b>
+            <%= sectionName %>
+          </b> | Year <b>
+            <%= year %>
+          </b>
+        </p>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Min %</label>
-        <input type="number" id="min" value="0" min="0" max="100" class="border rounded px-3 py-2 w-20">
+      <!-- 🔹 Filter Section -->
+      <div class="max-w-7xl mx-auto bg-white p-6 mt-6 rounded-lg shadow-md">
+
+        <!-- Show Subject Column Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Select Specific Subject</label>
+          <select id="displaySubject" class="border rounded px-3 py-2 w-full">
+            <option value="All">All Subjects</option>
+            <% if (subjects && subjects.length> 0) { %>
+              <% subjects.forEach(sub=> { %>
+                <option value="<%= sub.subject %>">
+                  <%= sub.subjectCode %> - <%= sub.subjectName %>
+                </option>
+                <% }) %>
+                  <% } %>
+                    <option value="Overall">Overall Only</option>
+          </select>
+        </div>
+
+        <h3 class="text-lg font-semibold mb-4 mt-2 flex items-center gap-2">
+          🔍 Filter Students
+        </h3>
+
+        <!-- 🧩 Grid Layout for Remaining Filters -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+          <!-- 🧩 Keep the "Filter by Subject" at the top -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Filter by Subject (for % range)
+            </label>
+            <select id="subject" class="border rounded px-3 py-2 w-full">
+              <option value="Overall">Overall</option>
+              <% if (subjects && subjects.length> 0) { %>
+                <% subjects.forEach(sub=> { %>
+                  <option value="<%= sub.subject %>">
+                    <%= sub.subjectCode %> - <%= sub.subjectName %>
+                  </option>
+                  <% }) %>
+                    <% } %>
+            </select>
+          </div>
+          <!-- Min Percentage -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Min %</label>
+            <input type="number" id="min" value="0" min="0" max="100" class="border rounded px-3 py-2 w-full" />
+          </div>
+
+          <!-- Max Percentage -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Max %</label>
+            <input type="number" id="max" value="100" min="0" max="100" class="border rounded px-3 py-2 w-full" />
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="gap-2 items-end mt-6">
+            <div class="flex justify-between items-center gap-2 mb-2">
+              <button onclick="applyFilter()"
+                class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 w-full">
+                Apply
+              </button>
+              <button onclick="resetFilter()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 w-full">
+                Reset
+              </button>
+              <button onclick="downloadReport()"
+                class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 w-full"> Download
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <div>
-        <label class="block text-sm font-medium text-gray-700">Max %</label>
-        <input type="number" id="max" value="100" min="0" max="100" class="border rounded px-3 py-2 w-20">
+      <!-- 🔹 Attendance Table -->
+      <div class="max-w-7xl mx-auto bg-white p-4 mt-4 rounded-lg shadow overflow-x-auto">
+        <%= branchName %>
+          <%= year %> , <%= semester %>, <%= sectionName %>
+                <table id="attendanceTable" class="min-w-full border text-xs">
+                  <thead class="bg-indigo-100 text-indigo-900">
+                    <tr>
+                      <th class="border px-2 py-1">S.No</th>
+                      <th class="border px-2 py-1">Enrollment</th>
+                      <% subjects.forEach(sub=> { %>
+                        <th colspan="4" class="border px-2 py-1 text-center subject-group"
+                          data-subject="<%= sub.subject %>">
+                          <%= sub.subject %>
+                        </th>
+                        <% }) %>
+                          <th colspan="3" class="border px-2 py-1 text-center overall-group">Overall</th>
+                    </tr>
+                    <tr>
+                      <th class="border px-2 py-1"></th>
+                      <th class="border px-2 py-1"></th>
+                      <% subjects.forEach(sub=> { %>
+                        <th class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">Total</th>
+                        <th class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">Present</th>
+                        <th class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">Absent</th>
+                        <th class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">%</th>
+                        <% }) %>
+                          <th class="border px-2 py-1 overall-col">Total</th>
+                          <th class="border px-2 py-1 overall-col">Attended</th>
+                          <th class="border px-2 py-1 overall-col">%</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% students.forEach((stu, index)=> { %>
+                      <tr class="hover:bg-gray-50">
+                        <td class="border px-2 py-1">
+                          <%= index + 1 %>
+                        </td>
+                        <td class="border px-2 py-1">
+                          <%= stu.enrollmentNo %>
+                        </td>
+
+                        <% subjects.forEach(sub=> {
+                          const subData = stu.subjectTotals.find(s => s.subject === sub.subject);
+                          %>
+                          <% if (subData) { %>
+                            <td class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">
+                              <%= subData.totalClass %>
+                            </td>
+                            <td class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">
+                              <%= subData.totalPresent %>
+                            </td>
+                            <td class="border px-2 py-1 subject-col" data-subject="<%= sub.subject %>">
+                              <%= subData.totalAbsent %>
+                            </td>
+                            <td class="border px-2 py-1 subject-percent subject-col" data-subject="<%= sub.subject %>">
+                              <%= subData.percentage %>
+                            </td>
+                            <% } else { %>
+                              <td colspan="4" class="border px-2 py-1 text-gray-400 text-center subject-col"
+                                data-subject="<%= sub.subject %>">-</td>
+                              <% } %>
+                                <% }) %>
+
+                                  <td class="border px-2 py-1 overall-col">
+                                    <%= stu.totalClass %>
+                                  </td>
+                                  <td class="border px-2 py-1 overall-col">
+                                    <%= stu.totalPresent %>
+                                  </td>
+                                  <td class="border px-2 py-1 overall-percent overall-col">
+                                    <%= stu.overallPercentage %>
+                                  </td>
+                      </tr>
+                      <% }) %>
+                  </tbody>
+                </table>
       </div>
 
-      <button onclick="applyFilter()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">
-        Apply
-      </button>
-      <button onclick="resetFilter()" class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400">
-        Reset
-      </button>
-      <button onclick="downloadReport()" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
-        ⬇ Download
-      </button>
-    </div>
-  </div>
+      <!-- 🔙 Back Link -->
+      <div class="text-center mt-4">
+        <a href="/viewReports" class="text-indigo-600 hover:underline">⬅ Back</a>
+      </div>
 
-  <!-- 🔹 Attendance Table -->
-  <div class="max-w-7xl mx-auto bg-white p-4 mt-4 rounded-lg shadow overflow-x-auto">
-    <table id="attendanceTable" class="min-w-full border text-xs">
-      <thead class="bg-indigo-100 text-indigo-900">
-        <tr>
-          <th class="border px-2 py-1">S.No</th>
-          <th class="border px-2 py-1">Enrollment</th>
-      
-          <% subjects.forEach(sub => { %>
-        
-            <th colspan="4" class="border px-2 py-1 text-center"><%= sub.subject %></th>
-          <% }) %>
-          <th colspan="3" class="border px-2 py-1 text-center">Overall</th>
-        </tr>
-        <tr>
-          <th class="border px-2 py-1"></th>
-          <th class="border px-2 py-1"></th>
-          <% subjects.forEach(() => { %>
-            <th class="border px-2 py-1">Total</th>
-            <th class="border px-2 py-1">Present</th>
-            <th class="border px-2 py-1">Absent</th>
-            <th class="border px-2 py-1">%</th>
-          <% }) %>
-          <th class="border px-2 py-1">Total</th>
-          <th class="border px-2 py-1">Attended</th>
-          <th class="border px-2 py-1">%</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% students.forEach((stu, index) => { %>
-          <tr class="hover:bg-gray-50">
-            <td class="border px-2 py-1"><%= index + 1 %></td>
-            <td class="border px-2 py-1"><%= stu.enrollmentNo %></td>
 
-            <% subjects.forEach(sub => {
-              const subData = stu.subjectTotals.find(s => s.subject === sub.subject);
-            %>
-              <% if (subData) { %>
-                <td class="border px-2 py-1"><%= subData.totalClass %></td>
-                <td class="border px-2 py-1"><%= subData.totalPresent %></td>
-                <td class="border px-2 py-1"><%= subData.totalAbsent %></td>
-                <td class="border px-2 py-1 subject-percent" data-subject="<%= sub.subject %>"><%= subData.percentage %></td>
-              <% } else { %>
-                <td colspan="4" class="border px-2 py-1 text-gray-400 text-center">-</td>
-              <% } %>
-            <% }) %>
+      <script>
+        // 🔹 Filter by percentage
+        function applyFilter() {
+          const subject = document.getElementById("subject").value;
+          const min = parseFloat(document.getElementById("min").value) || 0;
+          const max = parseFloat(document.getElementById("max").value) || 100;
 
-            <td class="border px-2 py-1"><%= stu.totalClass %></td>
-            <td class="border px-2 py-1"><%= stu.totalPresent %></td>
-            <td class="border px-2 py-1 overall-percent"><%= stu.overallPercentage %></td>
-          </tr>
-        <% }) %>
-      </tbody>
-    </table>
-  </div>
+          document.querySelectorAll("#attendanceTable tbody tr").forEach(row => {
+            let percent = NaN;
+            if (subject === "Overall") {
+              const cell = row.querySelector(".overall-percent");
+              percent = cell ? parseFloat(cell.textContent) || 0 : NaN;
+            } else {
+              const cell = row.querySelector(`.subject-percent[data-subject='${subject}']`);
+              percent = cell ? parseFloat(cell.textContent) || 0 : NaN;
+            }
 
-  <div class="text-center mt-4">
-    <a href="/" class="text-indigo-600 hover:underline">⬅ Back</a>
-  </div>
+            row.style.display = (!isNaN(percent) && percent >= min && percent <= max) ? "" : "none";
+          });
+        }
 
-  <script>
-    function applyFilter() {
-      const subject = document.getElementById("subject").value;
-      const min = parseFloat(document.getElementById("min").value) || 0;
-      const max = parseFloat(document.getElementById("max").value) || 100;
+        // 🔹 Reset all filters
+        function resetFilter() {
+          document.getElementById("min").value = 0;
+          document.getElementById("max").value = 100;
+          document.getElementById("subject").value = "Overall";
+          document.getElementById("displaySubject").value = "All";
 
-      document.querySelectorAll("#attendanceTable tbody tr").forEach(row => {
-        let percent = 0;
-        if (subject === "Overall") {
-          const cell = row.querySelector(".overall-percent");
-          percent = cell ? parseFloat(cell.textContent) || 0 : 0;
-        } 
-        row.style.display = (!isNaN(percent) && percent >= min && percent <= max) ? "" : "none";
-      });
-    }
+          document.querySelectorAll("#attendanceTable tbody tr").forEach(row => row.style.display = "");
+          document.querySelectorAll(".subject-col, .subject-group, .overall-col, .overall-group").forEach(cell => cell.style.display = "");
+        }
 
-    function resetFilter() {
-      document.getElementById("min").value = 0;
-      document.else {
-          const cell = row.querySelector(`.subject-percent[data-subject='${subject}']`);
-          percent = cell ? parseFloat(cell.textContent) || 0 : 0;
-        }getElementById("max").value = 100;
-      document.getElementById("subject").value = "Overall";
-      document.querySelectorAll("#attendanceTable tbody tr").forEach(row => row.style.display = "");
-    }
+        // 🔹 Download Filtered Attendance Report with Header on Top
+        async function downloadReport() {
+          const { jsPDF } = window.jspdf;
 
-    function downloadReport() {
-      const table = document.getElementById("attendanceTable");
-      const clone = table.cloneNode(true);
+          const table = document.getElementById("attendanceTable");
 
-      // Remove hidden rows before exporting
-      clone.querySelectorAll("tbody tr").forEach(row => {
-        if (row.style.display === "none") row.remove();
-      });
+          // Clone and remove hidden rows
+          const clone = table.cloneNode(true);
+          clone.querySelectorAll("tbody tr").forEach(row => {
+            if (row.style.display === "none" || row.classList.contains("hidden")) {
+              row.remove();
+            }
+          });
 
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.table_to_sheet(clone);
-      XLSX.utils.book_append_sheet(wb, ws, "Attendance Report");
-      XLSX.writeFile(wb, "Attendance_Report.xlsx");
-    }
-  </script>
+          // Create PDF
+          const doc = new jsPDF({
+            orientation: "landscape",
+            unit: "pt",
+            format: "a4"
+          });
 
-</body>
-</html>
+          const pageWidth = doc.internal.pageSize.getWidth();
+
+          // 🔹 Header Section (formatted like uploaded PDF)
+          doc.setFont("times", "bold");
+          doc.setFontSize(14);
+          doc.text("SHRI G. S. INSTITUTE OF TECHNOLOGY & SCIENCE, INDORE", pageWidth / 2, 40, { align: "center" });
+
+          doc.setFont("times", "bold");
+          doc.setFontSize(12);
+          doc.text("Branch - <%= branchName %>, Semester - <%= semester %>", pageWidth / 2, 60, { align: "center" });
+
+          doc.setFont("times", "bold");
+          doc.text("<%= year %> YEAR ATTENDANCE SHEET SECTION <%= sectionName %>", pageWidth / 2, 80, { align: "center" });
+
+          doc.setFont("times", "italic");
+          doc.setFontSize(10);
+          doc.text(
+            "Note: Please fill the attendance of <%= branchName %> <%= year %> <%= semester %> Semester <%= sectionName %> section students for each subject in the respective columns.",
+            pageWidth / 2,
+            100,
+            { align: "center" }
+          );
+
+          // 🔹 Table section
+          doc.autoTable({
+            html: clone,
+            startY: 120,
+            theme: "grid",
+            styles: { fontSize: 8, halign: "center", valign: "middle" },
+            headStyles: {
+              fillColor: [255, 255, 255],
+              textColor: [0, 0, 0],
+              fontStyle: "bold",
+              lineWidth: 0.5,
+              halign: "center"
+            },
+            bodyStyles: {
+              textColor: [0, 0, 0],
+              lineWidth: 0.3
+            },
+            columnStyles: {
+              0: { cellWidth: 30 },
+              1: { cellWidth: 80 },
+              2: { cellWidth: 70 },
+            },
+            didDrawPage: (data) => {
+              const pageCount = doc.internal.getNumberOfPages();
+              const pageSize = doc.internal.pageSize;
+              doc.setFontSize(8);
+              doc.text(`Page ${data.pageNumber} of ${pageCount}`, pageSize.width - 60, pageSize.height - 20);
+            }
+          });
+
+          // 🔹 Save PDF
+          const fileName = `Attendance_Report_<%= sectionName %>.pdf`;
+          doc.save(fileName);
+        }
+
+
+
+        // 🔹 Show only selected subject’s columns
+        function filterSubjectColumns() {
+          const selected = document.getElementById("displaySubject").value;
+
+          // Show everything first
+          document.querySelectorAll(".subject-col, .subject-group, .overall-col, .overall-group").forEach(cell => {
+            cell.style.display = "";
+          });
+
+          if (selected === "All") return;
+
+          if (selected === "Overall") {
+            // Hide all subject columns
+            document.querySelectorAll(".subject-col, .subject-group").forEach(cell => {
+              cell.style.display = "none";
+            });
+            return;
+          }
+
+          // Hide all subjects except the selected one
+          document.querySelectorAll(".subject-col, .subject-group").forEach(cell => {
+            if (cell.dataset.subject !== selected) {
+              cell.style.display = "none";
+            }
+          });
+
+          // Also show overall columns if subject selected
+          document.querySelectorAll(".overall-col, .overall-group").forEach(cell => cell.style.display = "");
+        }
+
+        // Trigger when dropdown changes
+        document.getElementById("displaySubject").addEventListener("change", filterSubjectColumns);
+      </script>
+
+  </body>
+
+  </html>
