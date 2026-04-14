@@ -11,6 +11,7 @@ const { isAdmin } = require("./middleware/auth");
 //Local Module
 const teacherRoutes = require("./routes/teacherRoutes");
 const rootDir = require("./utils/pathUtil");
+
 const errorsController = require("./controllers/errors");
 const { default: mongoose } = require('mongoose');
 const authRouter = require('./routes/authRouter');

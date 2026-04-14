@@ -31,7 +31,7 @@
           <% } %>
 
           <% if (user && user.userType === 'teacher') { %>
-            <li><a href="/showStudents" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Show Students</a></li>
+            <li><a href="/showStudents" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Manage Students</a></li>
             <li><a href="/markAttendance" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Mark Attendance</a></li>
             <li><a href="/report" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">View Attendance</a></li>
             <li>
@@ -75,12 +75,19 @@
           <% } %>
 
           <% if (user && user.userType === 'teacher') { %>
-            <li><a href="/showStudents" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Show Students</a></li>
-            <li><a href="/markAttendance" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Mark Attendance</a></li>
-          <% } %>
+            <li><a href="/showStudents" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800"> Manage Students</a></li>
+            <li><a href="/markAttendance" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Mark Attendance</a></li>
+            <li><a href="/report" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">View Attendance</a></li>
+            <li>
+              <form action="/viewReports" method="GET" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">
+              <button type="submit" class="text-white-500">Generate Report </button>
+              </form>
+            </li>
+            <% } %>
 
           <% if (user && user.userType === 'student') { %>
-            <li><a href="/student-dashboard" class="block py-2 px-4 rounded-lg hover:bg-white hover:text-gray-800 transition">Student Dashboard</a></li>
+            <li><a href="/student-dashboard" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Student Dashboard</a></li>
+            <li><a href="/edit-profile" class="py-2 px-4 rounded-lg transition duration-300 hover:bg-white hover:text-gray-800">Edit Profile</a></li>
           <% } %>
 
           <li>

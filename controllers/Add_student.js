@@ -82,7 +82,7 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       return res.render('store/showStudents', {
         selectedClass: className,
         selectedSection: sectionName,
-        selectedYear: year || '',
+        selectedYear: year,
         students: [],
         pageTitle: "Show Students",
         currentPage: "Show_Students",
@@ -92,10 +92,11 @@ exports.getStudentsByClassAndSection = async (req, res) => {
       });
     }
     else {
+      console.log('Found class document:', classDoc);
     res.render('store/showStudents', {
       selectedClass: className,
       selectedSection: sectionName,
-      selectedYear: year || '',
+      selectedYear: year ,
       students: classDoc ? classDoc.students : [],
       pageTitle: "Show Students",
       currentPage: "Show_Students",
