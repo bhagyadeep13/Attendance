@@ -3,11 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node app.js",
-    "dev": "nodemon app.js",
-    "build": "npx tailwindcss -i ./views/input.css -o ./public/output.css"
-  },
+  "start": "node app.js",
+  "dev": "npx nodemon app.js",
+  "build": "npx tailwindcss -i ./views/input.css -o ./public/output.css --watch"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
