@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "build": "tailwindcss -i ./views/input.css -o ./public/output.css --minify"
-  },
+  "start": "node app.js",
+  "build": "node ./node_modules/@tailwindcss/cli/bin/tailwindcss -i ./views/input.css -o ./public/output.css --minify"
+},
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "nodemon": "^3.1.7"
