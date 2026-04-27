@@ -4,8 +4,7 @@
   "main": "index.js",
   "scripts": {
   "start": "node app.js",
-  "dev": "npx nodemon app.js",
-  "build": "npx tailwindcss -i ./views/input.css -o ./public/output.css --watch"
+  "build": "npx tailwindcss -i ./views/input.css -o ./public/output.css --minify"
 },
   "keywords": [],
   "author": "",
