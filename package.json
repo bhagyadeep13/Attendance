@@ -3,15 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
-    "build": "node ./node_modules/tailwindcss/lib/cli.js -i ./views/input.css -o ./public/output.css --minify"
-  },
+  "start": "node app.js",
+  "build": "npx @tailwindcss/cli -i ./views/input.css -o ./public/output.css --minify"
+},
   "devDependencies": {
     "autoprefixer": "^10.4.20",
     "nodemon": "^3.1.7"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "@tailwindcss/cli": "^4.2.4",
+    "tailwindcss": "^4.2.4",
     "body-parser": "^1.20.3",
     "connect-mongodb-session": "^5.0.0",
     "ejs": "^3.1.10",
@@ -22,7 +24,6 @@
     "mongoose": "^8.12.1",
     "mysql2": "^3.11.4",
     "pdfkit": "^0.17.2",
-    "tailwindcss": "^4.2.4",
     "xlsx": "^0.18.5"
   }
 }
